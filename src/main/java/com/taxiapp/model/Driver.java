@@ -28,6 +28,6 @@ public class Driver {
     private Gender gender;
 
     @ManyToOne
-    @JoinColumn(name = "car", nullable = false)
+    @JoinColumn(name = "car_id", nullable = false)
     private Car car;
 }
