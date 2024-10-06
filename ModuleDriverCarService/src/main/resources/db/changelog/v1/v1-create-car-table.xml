@@ -1,0 +1,39 @@
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="v1-1" author="strangerforfallen@gmail.com">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="car"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="car">
+            <column name="id" type="serial" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="model" type="varchar(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="registration_code" type="varchar(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(40)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <insert tableName="car">
+            <column name="model" value ="Passat B5"/>
+            <column name="registration_code" value ="2134AA-2"/>
+            <column name="status" value ="IN_USE"/>
+        </insert>
+
+        <rollback>
+            <dropTable tableName="car"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,59 @@
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="v1-1" author="strangerforfallen@gmail.com">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="driver"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="driver">
+            <column name="id" type="serial" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="varchar(40)">-->
+                <constraints nullable="false"/>
+            </column>
+            <column name="gender" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone" type="varchar(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="car_id" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(40)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <insert tableName="driver">
+            <column name="name" value ="Rolf Sirdson"/>
+            <column name="email" value ="sirdson@gmail.com"/>
+            <column name="gender" value ="MALE"/>
+            <column name="phone" value ="+375291344191"/>
+            <column name="car_id" value ="1"/>
+            <column name="status" value ="WORKING"/>
+        </insert>
+
+        <addForeignKeyConstraint baseTableName="driver"
+                                 baseColumnNames="car_id"
+                                 constraintName="fk_Driver_car"
+                                 referencedTableName="car"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"
+                                 onUpdate="CASCADE"/>
+
+        <rollback>
+            <dropTable tableName="driver"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
