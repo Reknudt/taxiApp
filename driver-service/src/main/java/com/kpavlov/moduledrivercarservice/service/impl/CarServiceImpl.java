@@ -1,0 +1,122 @@
+package com.kpavlov.moduledrivercarservice.service.impl;
+
+import com.kpavlov.moduledrivercarservice.dto.response.CarResponse;
+import com.kpavlov.moduledrivercarservice.exceprion.CarNotFoundException;
+import com.kpavlov.moduledrivercarservice.exceprion.DuplicateFoundException;
+import com.kpavlov.moduledrivercarservice.mapper.CarMapper;
+import com.kpavlov.moduledrivercarservice.model.CarStatus;
+import com.kpavlov.moduledrivercarservice.repository.CarRepository;
+import com.kpavlov.moduledrivercarservice.service.CarService;
+import com.kpavlov.moduledrivercarservice.dto.request.create.CarCreateRequest;
+import com.kpavlov.moduledrivercarservice.dto.request.update.CarUpdateRequest;
+import com.kpavlov.moduledrivercarservice.model.Car;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class CarServiceImpl implements CarService {
+
+    private final CarRepository carRepository;
+    private final CarMapper carMapper;
+    private final MessageSource messageSource;
+
+    @Override
+    @Transactional
+    public CarResponse createCar(CarCreateRequest createCarRequest) {
+        checkCreateCarData(createCarRequest);
+
+        Car car = carMapper.createRequestToEntity(createCarRequest);
+        return carMapper.toResponse(carRepository.save(car));
+    }
+
+    @Override
+    @Transactional
+    public CarResponse updateCar(Long id, CarUpdateRequest updateCarRequest) {
+        Car car = findCarByIdOrThrow(id);
+
+        checkUpdateCarData(updateCarRequest, car);
+
+        carMapper.updateCarFromUpdateRequest(updateCarRequest, car);
+        return carMapper.toResponse(carRepository.save(car));
+    }
+
+    @Override
+    @Transactional
+    public void softDeleteCar(Long id) {
+        Car car = findCarByIdOrThrow(id);
+        car.setStatus(CarStatus.DELETED);
+        carMapper.toResponse(carRepository.save(car));
+    }
+
+    @Override
+    @Transactional
+    public void deleteCar(Long id) {
+        carRepository.deleteById(id);
+    }
+
+    @Override
+    public CarResponse getCarById(Long id) {
+        Car car = findCarByIdOrThrow(id);
+        return carMapper.toResponse(car);
+    }
+
+    @Override
+    public List<CarResponse> getAllCars() {
+        return carRepository.findAll().stream()
+                .map(carMapper::toResponse)
+                .toList();
+    }
+
+    private void checkCreateCarData(CarCreateRequest createCarRequest){
+        Optional<Car> optionalCar = carRepository.getCarByRegistrationCode(createCarRequest.registrationCode());
+
+        if (optionalCar.isPresent() && optionalCar.get().getStatus() != CarStatus.DELETED) {
+
+            String errorMessage = String.format(
+                    messageSource.getMessage(
+                    "error.duplicate.regCode",
+                    new Object[]{createCarRequest.registrationCode()},
+                    null),
+                    createCarRequest.registrationCode());
+            throw new DuplicateFoundException(errorMessage);
+        }
+    }
+
+    private void checkUpdateCarData(CarUpdateRequest updateCarRequest, Car existingCar) {
+
+        List<Car> cars = carRepository.findAllByRegistrationCodeEquals(updateCarRequest.registrationCode());
+
+        for(Car c: cars) {
+            if (c.getRegistrationCode().equals(existingCar.getRegistrationCode())
+                    && !c.getStatus().equals(CarStatus.DELETED)
+                    && !c.getId().equals(existingCar.getId())) {
+
+                String errorMessage = String.format(
+                        messageSource.getMessage(
+                        "error.duplicate.regCode",
+                        null,
+                        null),
+                        existingCar.getRegistrationCode());
+                throw new DuplicateFoundException(errorMessage);
+            }
+        }
+    }
+
+    private Car findCarByIdOrThrow(Long id) {
+        return carRepository.findById(id)
+                .orElseThrow(
+                        () -> { String errorMessage = String.format(
+                                messageSource.getMessage(
+                                "error.not.found",
+                                null,
+                                null),
+                                id);
+                            return new CarNotFoundException(errorMessage);});
+    }
+}
