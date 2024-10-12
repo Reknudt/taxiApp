@@ -19,5 +19,4 @@ public final class ErrorMessages {
     public static final String  ERROR_DUPLICATE_PHONE = "error.duplicate.phone";
 
     public static final String  ERROR_DUPLICATE_EMAIL = "error.duplicate.email";
-
 }
