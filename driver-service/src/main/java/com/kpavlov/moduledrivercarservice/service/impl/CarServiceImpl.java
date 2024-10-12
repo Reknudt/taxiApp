@@ -119,9 +119,9 @@ public class CarServiceImpl implements CarService {
     private Car findCarByIdOrThrow(Long id) {
         return carRepository.findById(id)
                 .orElseThrow(
-                        () -> { return new CarNotFoundException(messageSource.getMessage(
+                        () -> new CarNotFoundException(messageSource.getMessage(
                                 ERROR_NOT_FOUND,
                                 new Object[]{id},
-                                null));});
+                                null)));
     }
 }

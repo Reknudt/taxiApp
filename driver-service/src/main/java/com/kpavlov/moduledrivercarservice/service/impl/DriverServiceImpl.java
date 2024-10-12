@@ -76,7 +76,7 @@ public class DriverServiceImpl implements DriverService {
         Page<Driver> driverPage = driverRepository.findAll(PageRequest.of(offset, limit));
 
         List<DriverResponse> driverResponses = driverPage.getContent().stream()
-                .map(driver -> new DriverResponse(driver.getId(), driver.getPhone(), driver.getEmail(), driver.getName(), driver.getGender(), driver.getCarId(), driver.getStatus().name()))
+                .map(driver -> new DriverResponse(driver.getId(), driver.getPhone(), driver.getName(), driver.getEmail(), driver.getGender(), driver.getCarId(), driver.getStatus().name()))
                 .collect(Collectors.toList());
 
         return new DriverResponsePage(driverResponses, driverPage.getNumber(), driverPage.getTotalPages(), driverPage.getTotalElements());
@@ -123,9 +123,9 @@ public class DriverServiceImpl implements DriverService {
     private Driver findDriverByIdOrThrow(Long id) {
         return driverRepository.findById(id)
                 .orElseThrow(
-                        () -> { return new DriverNotFoundException(messageSource.getMessage(
+                        () -> new DriverNotFoundException(messageSource.getMessage(
                                 ERROR_NOT_FOUND,
                                 new Object[]{id},
-                                null));});
+                                null)));
     }
 }
