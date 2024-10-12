@@ -8,9 +8,13 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "car")
 public class Car {
@@ -28,36 +32,4 @@ public class Car {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private CarStatus status;
-
-    public String getRegistrationCode() {
-        return registrationCode;
-    }
-
-    public void setRegistrationCode(String registrationCode) {
-        this.registrationCode = registrationCode;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public CarStatus getStatus() {
-        return status;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
-    }
-
-    public void setStatus(CarStatus status) {
-        this.status = status;
-    }
 }

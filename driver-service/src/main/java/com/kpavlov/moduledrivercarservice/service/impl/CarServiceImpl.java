@@ -1,6 +1,7 @@
 package com.kpavlov.moduledrivercarservice.service.impl;
 
 import com.kpavlov.moduledrivercarservice.dto.response.CarResponse;
+import com.kpavlov.moduledrivercarservice.dto.response.CarResponsePage;
 import com.kpavlov.moduledrivercarservice.exceprion.CarNotFoundException;
 import com.kpavlov.moduledrivercarservice.exceprion.DuplicateFoundException;
 import com.kpavlov.moduledrivercarservice.mapper.CarMapper;
@@ -12,11 +13,17 @@ import com.kpavlov.moduledrivercarservice.dto.request.update.CarUpdateRequest;
 import com.kpavlov.moduledrivercarservice.model.Car;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static com.kpavlov.moduledrivercarservice.util.ErrorMessages.ERROR_DUPLICATE_REG_CODE;
+import static com.kpavlov.moduledrivercarservice.util.ErrorMessages.ERROR_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -67,24 +74,26 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public List<CarResponse> getAllCars() {
-        return carRepository.findAll().stream()
-                .map(carMapper::toResponse)
-                .toList();
+    public CarResponsePage getAllCars(int offset, int limit) {
+        Page<Car> carPage = carRepository.findAll(PageRequest.of(offset, limit));
+
+        List<CarResponse> carResponses = carPage.getContent().stream()
+                .map(car -> new CarResponse(car.getId(), car.getModel(), car.getRegistrationCode(), car.getStatus().name()))
+                .collect(Collectors.toList());
+
+        return new CarResponsePage(carResponses, carPage.getNumber(), carPage.getTotalPages(), carPage.getTotalElements());
     }
 
     private void checkCreateCarData(CarCreateRequest createCarRequest){
         Optional<Car> optionalCar = carRepository.getCarByRegistrationCode(createCarRequest.registrationCode());
 
         if (optionalCar.isPresent() && optionalCar.get().getStatus() != CarStatus.DELETED) {
+            String regCode = createCarRequest.registrationCode();
 
-            String errorMessage = String.format(
-                    messageSource.getMessage(
-                    "error.duplicate.regCode",
-                    new Object[]{createCarRequest.registrationCode()},
-                    null),
-                    createCarRequest.registrationCode());
-            throw new DuplicateFoundException(errorMessage);
+            throw new DuplicateFoundException(messageSource.getMessage(
+                    ERROR_DUPLICATE_REG_CODE,
+                    new Object[]{regCode},
+                    null));
         }
     }
 
@@ -97,13 +106,12 @@ public class CarServiceImpl implements CarService {
                     && !c.getStatus().equals(CarStatus.DELETED)
                     && !c.getId().equals(existingCar.getId())) {
 
-                String errorMessage = String.format(
-                        messageSource.getMessage(
-                        "error.duplicate.regCode",
-                        null,
-                        null),
-                        existingCar.getRegistrationCode());
-                throw new DuplicateFoundException(errorMessage);
+                String regCode = existingCar.getRegistrationCode();
+
+                throw new DuplicateFoundException(messageSource.getMessage(
+                        ERROR_DUPLICATE_REG_CODE,
+                        new Object[]{regCode},
+                        null));
             }
         }
     }
@@ -111,12 +119,9 @@ public class CarServiceImpl implements CarService {
     private Car findCarByIdOrThrow(Long id) {
         return carRepository.findById(id)
                 .orElseThrow(
-                        () -> { String errorMessage = String.format(
-                                messageSource.getMessage(
-                                "error.not.found",
-                                null,
-                                null),
-                                id);
-                            return new CarNotFoundException(errorMessage);});
+                        () -> { return new CarNotFoundException(messageSource.getMessage(
+                                ERROR_NOT_FOUND,
+                                new Object[]{id},
+                                null));});
     }
 }

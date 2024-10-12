@@ -3,6 +3,8 @@ package com.kpavlov.moduledrivercarservice.service.impl;
 import com.kpavlov.moduledrivercarservice.dto.request.create.DriverCreateRequest;
 import com.kpavlov.moduledrivercarservice.dto.request.update.DriverUpdateRequest;
 import com.kpavlov.moduledrivercarservice.dto.response.DriverResponse;
+import com.kpavlov.moduledrivercarservice.dto.response.DriverResponsePage;
+import com.kpavlov.moduledrivercarservice.exceprion.CarNotFoundException;
 import com.kpavlov.moduledrivercarservice.exceprion.DuplicateFoundException;
 import com.kpavlov.moduledrivercarservice.exceprion.DriverNotFoundException;
 import com.kpavlov.moduledrivercarservice.mapper.DriverMapper;
@@ -12,9 +14,14 @@ import com.kpavlov.moduledrivercarservice.repository.DriverRepository;
 import com.kpavlov.moduledrivercarservice.service.DriverService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.kpavlov.moduledrivercarservice.util.ErrorMessages.*;
 
 @Service
 @RequiredArgsConstructor
@@ -65,62 +72,60 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public List<DriverResponse> getAllDrivers() {
-        return driverRepository.findAll().stream()
-                .map(driverMapper::toResponse)
-                .toList();
+    public DriverResponsePage getAllDrivers(int offset, int limit) {
+        Page<Driver> driverPage = driverRepository.findAll(PageRequest.of(offset, limit));
+
+        List<DriverResponse> driverResponses = driverPage.getContent().stream()
+                .map(driver -> new DriverResponse(driver.getId(), driver.getPhone(), driver.getEmail(), driver.getName(), driver.getGender(), driver.getCarId(), driver.getStatus().name()))
+                .collect(Collectors.toList());
+
+        return new DriverResponsePage(driverResponses, driverPage.getNumber(), driverPage.getTotalPages(), driverPage.getTotalElements());
     }
 
     private void checkCreateDriverData(DriverCreateRequest createDriverRequest){
         if (driverRepository.existsByEmail(createDriverRequest.email())) {
-            String errorMessage = String.format(
-                    messageSource.getMessage(
-                    "error.duplicate.email",
-                    null,
-                    null),
-                    createDriverRequest.phone());
-            throw new DuplicateFoundException(errorMessage);
+            String email = createDriverRequest.email();
+
+            throw new DuplicateFoundException(messageSource.getMessage(
+                    ERROR_DUPLICATE_EMAIL,
+                    new Object[]{email},
+                    null));
         }
         if (driverRepository.existsByPhone(createDriverRequest.phone())) {
-            String errorMessage = String.format(
-                    messageSource.getMessage(
-                    "error.duplicate.phone",
-                     null,
-                    null),
-                    createDriverRequest.phone());
-            throw new DuplicateFoundException(errorMessage);
+            String phone = createDriverRequest.phone();
+
+            throw new DuplicateFoundException(messageSource.getMessage(
+                    ERROR_DUPLICATE_PHONE,
+                    new Object[]{phone},
+                    null));
         }
     }
 
     private void checkUpdateDriverData(DriverUpdateRequest updateDriverRequest, Driver existingDriver) {
         if (!updateDriverRequest.email().equals(existingDriver.getEmail()) && driverRepository.existsByEmail(updateDriverRequest.email())) {
-            String errorMessage = String.format(messageSource.getMessage(
-                    "error.duplicate.email",
-                    null,
-                    null),
-                    updateDriverRequest.email());
-            throw new DuplicateFoundException(errorMessage);
+            String email = updateDriverRequest.email();
+
+            throw new DuplicateFoundException(messageSource.getMessage(
+                    ERROR_DUPLICATE_EMAIL,
+                    new Object[]{email},
+                    null));
         }
         if (!updateDriverRequest.phone().equals(existingDriver.getPhone()) && driverRepository.existsByPhone(updateDriverRequest.phone())) {
-            String errorMessage = String.format(
-                    messageSource.getMessage(
-                    "error.duplicate.phone",
-                    null,
-                    null),
-                    updateDriverRequest.phone());
-            throw new DuplicateFoundException(errorMessage);
+            String phone = updateDriverRequest.phone();
+
+            throw new DuplicateFoundException(messageSource.getMessage(
+                    ERROR_DUPLICATE_PHONE,
+                    new Object[]{phone},
+                    null));
         }
     }
 
     private Driver findDriverByIdOrThrow(Long id) {
         return driverRepository.findById(id)
                 .orElseThrow(
-                        () -> { String errorMessage = String.format(
-                                messageSource.getMessage(
-                                "error.not.found",
-                                null,
-                                null),
-                            id);
-        return new DriverNotFoundException(errorMessage);});
+                        () -> { return new DriverNotFoundException(messageSource.getMessage(
+                                ERROR_NOT_FOUND,
+                                new Object[]{id},
+                                null));});
     }
 }

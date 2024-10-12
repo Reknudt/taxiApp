@@ -3,7 +3,7 @@ package com.kpavlov.moduledrivercarservice.service;
 import com.kpavlov.moduledrivercarservice.dto.request.create.CarCreateRequest;
 import com.kpavlov.moduledrivercarservice.dto.request.update.CarUpdateRequest;
 import com.kpavlov.moduledrivercarservice.dto.response.CarResponse;
-import java.util.List;
+import com.kpavlov.moduledrivercarservice.dto.response.CarResponsePage;
 
 public interface CarService {
 
@@ -17,5 +17,5 @@ public interface CarService {
 
     CarResponse getCarById(Long id);
 
-    List<CarResponse> getAllCars();
+    CarResponsePage getAllCars(int offset, int limit);
 }

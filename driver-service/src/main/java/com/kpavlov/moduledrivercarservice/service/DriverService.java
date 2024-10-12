@@ -3,8 +3,7 @@ package com.kpavlov.moduledrivercarservice.service;
 import com.kpavlov.moduledrivercarservice.dto.request.create.DriverCreateRequest;
 import com.kpavlov.moduledrivercarservice.dto.request.update.DriverUpdateRequest;
 import com.kpavlov.moduledrivercarservice.dto.response.DriverResponse;
-
-import java.util.List;
+import com.kpavlov.moduledrivercarservice.dto.response.DriverResponsePage;
 
 public interface DriverService {
 
@@ -18,5 +17,5 @@ public interface DriverService {
 
     DriverResponse getDriverById(Long id);
 
-    List<DriverResponse> getAllDrivers();
+    DriverResponsePage getAllDrivers(int offset, int limit);
 }

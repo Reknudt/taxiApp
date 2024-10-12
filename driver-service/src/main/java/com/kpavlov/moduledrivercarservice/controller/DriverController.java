@@ -3,15 +3,12 @@ package com.kpavlov.moduledrivercarservice.controller;
 import com.kpavlov.moduledrivercarservice.dto.request.create.DriverCreateRequest;
 import com.kpavlov.moduledrivercarservice.dto.request.update.DriverUpdateRequest;
 import com.kpavlov.moduledrivercarservice.dto.response.DriverResponse;
-import com.kpavlov.moduledrivercarservice.model.Driver;
-import com.kpavlov.moduledrivercarservice.repository.DriverRepository;
+import com.kpavlov.moduledrivercarservice.dto.response.DriverResponsePage;
 import com.kpavlov.moduledrivercarservice.service.DriverService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +27,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class DriverController {
 
     private final DriverService driverService;
-    private final DriverRepository driverRepository;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -63,9 +59,8 @@ public class DriverController {
     }
 
     @GetMapping
-    public Page<Driver> getAllDrivers(
-            @RequestParam(value = "offset", defaultValue = "0") @Min(0) Integer offset,
-            @RequestParam(value = "limit", defaultValue = "20") @Min(1) @Max(100) Integer limit) {
-        return driverRepository.findAll(PageRequest.of(offset, limit));
+    public DriverResponsePage getAllDrivers(@RequestParam(value = "offset", defaultValue = "0") @Min(0) Integer offset,
+                                            @RequestParam(value = "limit", defaultValue = "20") @Min(1) @Max(100) Integer limit) {
+        return driverService.getAllDrivers(offset, limit);
     }
 }
