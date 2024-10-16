@@ -31,8 +31,3 @@ build/
 
 ### VS Code ###
 .vscode/
-/ModuleDriverCarService/mvnw
-/mvnw
-/ModuleDriverCarService/mvnw.cmd
-/mvnw.cmd
-/src/test/java/com/taxiapp/TaxiAppApplicationTests.java
