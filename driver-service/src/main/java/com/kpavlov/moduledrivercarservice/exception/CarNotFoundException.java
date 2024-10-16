@@ -1,4 +1,4 @@
-package com.kpavlov.moduledrivercarservice.exceprion;
+package com.kpavlov.moduledrivercarservice.exception;
 
 public class CarNotFoundException extends RuntimeException {
 

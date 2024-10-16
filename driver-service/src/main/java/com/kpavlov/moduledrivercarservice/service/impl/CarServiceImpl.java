@@ -2,9 +2,10 @@ package com.kpavlov.moduledrivercarservice.service.impl;
 
 import com.kpavlov.moduledrivercarservice.dto.response.CarResponse;
 import com.kpavlov.moduledrivercarservice.dto.response.CarResponsePage;
-import com.kpavlov.moduledrivercarservice.exceprion.CarNotFoundException;
-import com.kpavlov.moduledrivercarservice.exceprion.DuplicateFoundException;
+import com.kpavlov.moduledrivercarservice.exception.CarNotFoundException;
+import com.kpavlov.moduledrivercarservice.exception.DuplicateFoundException;
 import com.kpavlov.moduledrivercarservice.mapper.CarMapper;
+import com.kpavlov.moduledrivercarservice.mapper.CarPageMapper;
 import com.kpavlov.moduledrivercarservice.model.CarStatus;
 import com.kpavlov.moduledrivercarservice.repository.CarRepository;
 import com.kpavlov.moduledrivercarservice.service.CarService;
@@ -13,6 +14,7 @@ import com.kpavlov.moduledrivercarservice.dto.request.update.CarUpdateRequest;
 import com.kpavlov.moduledrivercarservice.model.Car;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,7 @@ public class CarServiceImpl implements CarService {
 
     private final CarRepository carRepository;
     private final CarMapper carMapper;
+    private final CarPageMapper carPageMapper;
     private final MessageSource messageSource;
 
     @Override
@@ -78,10 +81,10 @@ public class CarServiceImpl implements CarService {
         Page<Car> carPage = carRepository.findAll(PageRequest.of(offset, limit));
 
         List<CarResponse> carResponses = carPage.getContent().stream()
-                .map(car -> new CarResponse(car.getId(), car.getModel(), car.getRegistrationCode(), car.getStatus().name()))
+                .map(carMapper::toResponse)
                 .collect(Collectors.toList());
 
-        return new CarResponsePage(carResponses, carPage.getNumber(), carPage.getTotalPages(), carPage.getTotalElements());
+        return carPageMapper.toCarResponsePage(carResponses, carPage, limit);
     }
 
     private void checkCreateCarData(CarCreateRequest createCarRequest){
@@ -93,7 +96,7 @@ public class CarServiceImpl implements CarService {
             throw new DuplicateFoundException(messageSource.getMessage(
                     ERROR_DUPLICATE_REG_CODE,
                     new Object[]{regCode},
-                    null));
+                    LocaleContextHolder.getLocale()));
         }
     }
 
@@ -111,7 +114,7 @@ public class CarServiceImpl implements CarService {
                 throw new DuplicateFoundException(messageSource.getMessage(
                         ERROR_DUPLICATE_REG_CODE,
                         new Object[]{regCode},
-                        null));
+                        LocaleContextHolder.getLocale()));
             }
         }
     }
@@ -122,6 +125,6 @@ public class CarServiceImpl implements CarService {
                         () -> new CarNotFoundException(messageSource.getMessage(
                                 ERROR_NOT_FOUND,
                                 new Object[]{id},
-                                null)));
+                                LocaleContextHolder.getLocale())));
     }
 }

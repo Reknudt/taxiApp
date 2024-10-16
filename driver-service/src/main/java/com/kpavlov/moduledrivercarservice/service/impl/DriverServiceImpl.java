@@ -4,16 +4,17 @@ import com.kpavlov.moduledrivercarservice.dto.request.create.DriverCreateRequest
 import com.kpavlov.moduledrivercarservice.dto.request.update.DriverUpdateRequest;
 import com.kpavlov.moduledrivercarservice.dto.response.DriverResponse;
 import com.kpavlov.moduledrivercarservice.dto.response.DriverResponsePage;
-import com.kpavlov.moduledrivercarservice.exceprion.CarNotFoundException;
-import com.kpavlov.moduledrivercarservice.exceprion.DuplicateFoundException;
-import com.kpavlov.moduledrivercarservice.exceprion.DriverNotFoundException;
+import com.kpavlov.moduledrivercarservice.exception.DuplicateFoundException;
+import com.kpavlov.moduledrivercarservice.exception.DriverNotFoundException;
 import com.kpavlov.moduledrivercarservice.mapper.DriverMapper;
+import com.kpavlov.moduledrivercarservice.mapper.DriverPageMapper;
 import com.kpavlov.moduledrivercarservice.model.Driver;
 import com.kpavlov.moduledrivercarservice.model.DriverStatus;
 import com.kpavlov.moduledrivercarservice.repository.DriverRepository;
 import com.kpavlov.moduledrivercarservice.service.DriverService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.kpavlov.moduledrivercarservice.util.ErrorMessages.*;
+import static com.kpavlov.moduledrivercarservice.util.ErrorMessages.ERROR_DUPLICATE_EMAIL;
+import static com.kpavlov.moduledrivercarservice.util.ErrorMessages.ERROR_DUPLICATE_PHONE;
+import static com.kpavlov.moduledrivercarservice.util.ErrorMessages.ERROR_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +32,7 @@ public class DriverServiceImpl implements DriverService {
 
     private final DriverRepository driverRepository;
     private final DriverMapper driverMapper;
+    private final DriverPageMapper driverPageMapper;
     private final MessageSource messageSource;
 
     @Override
@@ -76,10 +80,10 @@ public class DriverServiceImpl implements DriverService {
         Page<Driver> driverPage = driverRepository.findAll(PageRequest.of(offset, limit));
 
         List<DriverResponse> driverResponses = driverPage.getContent().stream()
-                .map(driver -> new DriverResponse(driver.getId(), driver.getPhone(), driver.getName(), driver.getEmail(), driver.getGender(), driver.getCarId(), driver.getStatus().name()))
+                .map(driverMapper::toResponse)
                 .collect(Collectors.toList());
 
-        return new DriverResponsePage(driverResponses, driverPage.getNumber(), driverPage.getTotalPages(), driverPage.getTotalElements());
+        return driverPageMapper.toDriverResponsePage(driverResponses, driverPage, limit);
     }
 
     private void checkCreateDriverData(DriverCreateRequest createDriverRequest){
@@ -89,7 +93,7 @@ public class DriverServiceImpl implements DriverService {
             throw new DuplicateFoundException(messageSource.getMessage(
                     ERROR_DUPLICATE_EMAIL,
                     new Object[]{email},
-                    null));
+                    LocaleContextHolder.getLocale()));
         }
         if (driverRepository.existsByPhone(createDriverRequest.phone())) {
             String phone = createDriverRequest.phone();
@@ -97,7 +101,7 @@ public class DriverServiceImpl implements DriverService {
             throw new DuplicateFoundException(messageSource.getMessage(
                     ERROR_DUPLICATE_PHONE,
                     new Object[]{phone},
-                    null));
+                    LocaleContextHolder.getLocale()));
         }
     }
 
@@ -108,7 +112,7 @@ public class DriverServiceImpl implements DriverService {
             throw new DuplicateFoundException(messageSource.getMessage(
                     ERROR_DUPLICATE_EMAIL,
                     new Object[]{email},
-                    null));
+                    LocaleContextHolder.getLocale()));
         }
         if (!updateDriverRequest.phone().equals(existingDriver.getPhone()) && driverRepository.existsByPhone(updateDriverRequest.phone())) {
             String phone = updateDriverRequest.phone();
@@ -116,7 +120,7 @@ public class DriverServiceImpl implements DriverService {
             throw new DuplicateFoundException(messageSource.getMessage(
                     ERROR_DUPLICATE_PHONE,
                     new Object[]{phone},
-                    null));
+                    LocaleContextHolder.getLocale()));
         }
     }
 
@@ -126,6 +130,6 @@ public class DriverServiceImpl implements DriverService {
                         () -> new DriverNotFoundException(messageSource.getMessage(
                                 ERROR_NOT_FOUND,
                                 new Object[]{id},
-                                null)));
+                                LocaleContextHolder.getLocale())));
     }
 }

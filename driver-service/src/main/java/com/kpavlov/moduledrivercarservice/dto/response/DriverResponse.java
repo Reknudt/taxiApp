@@ -1,7 +1,6 @@
 package com.kpavlov.moduledrivercarservice.dto.response;
 
 import com.kpavlov.moduledrivercarservice.model.Gender;
-import jakarta.validation.constraints.NotBlank;
 
 public record DriverResponse(
 

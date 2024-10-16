@@ -1,8 +1,8 @@
 package com.kpavlov.moduledrivercarservice.controller;
 
-import com.kpavlov.moduledrivercarservice.exceprion.CarNotFoundException;
-import com.kpavlov.moduledrivercarservice.exceprion.DuplicateFoundException;
-import com.kpavlov.moduledrivercarservice.exceprion.DriverNotFoundException;
+import com.kpavlov.moduledrivercarservice.exception.CarNotFoundException;
+import com.kpavlov.moduledrivercarservice.exception.DuplicateFoundException;
+import com.kpavlov.moduledrivercarservice.exception.DriverNotFoundException;
 import com.kpavlov.moduledrivercarservice.util.ErrorMessages;
 import com.kpavlov.moduledrivercarservice.dto.response.error.ErrorResponse;
 import com.kpavlov.moduledrivercarservice.dto.response.error.MultiErrorResponse;
@@ -72,10 +72,10 @@ public class ControllerAdvice {
     }
 
     @ExceptionHandler(DuplicateFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handlerDuplicateFound(DuplicateFoundException e) {
         return ErrorResponse.builder()
-                .status(HttpStatus.NOT_ACCEPTABLE.value())
+                .status(HttpStatus.CONFLICT.value())
                 .message(e.getMessage())
                 .build();
     }

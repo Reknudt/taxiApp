@@ -10,3 +10,6 @@ spring:
 
   liquibase:
     change-log: classpath:db/changelog/main-changelog.xml
+
+  messages:
+    basename: messages

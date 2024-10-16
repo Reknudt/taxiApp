@@ -1,19 +1,14 @@
 package com.kpavlov.moduledrivercarservice.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
 import java.util.List;
 
-@Getter
-@AllArgsConstructor
-public class DriverResponsePage {
+public record DriverResponsePage (
 
-    private List<DriverResponse> drivers;
+    List<DriverResponse> driverResponses,
 
-    private int currentPage;
+    int currentPage,
 
-    private int totalPages;
+    int totalPages,
 
-    private long totalElements;
-}
+    int limit
+) {}
