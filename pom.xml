@@ -18,7 +18,7 @@
     <description>taxiApp</description>
 
     <modules>
-        <module>ModulePassengerService</module>
+        <module>passenger-service</module>
         <module>driver-service</module>
     </modules>
 
