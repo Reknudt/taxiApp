@@ -1,0 +1,70 @@
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="v1-1" author="strangerforfallen@gmail.com">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ride"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="ride">
+            <column name="id" type="serial" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="driver_id" type="serial">
+                <constraints nullable="false"/>
+            </column>
+            <column name="passenger_id" type="serial">
+                <constraints nullable="false"/>
+            </column>
+            <column name="address_departure" type="varchar(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="address_destination" type="varchar(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="price" type="double precision">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <insert tableName="ride">
+            <column name="driver_id" value ="2"/>
+            <column name="passenger_id" value ="1"/>
+            <column name="address_departure" value ="Vitebsk, Lenin street, 23"/>
+            <column name="address_destination" value ="Minsk, Soltysa street, 12"/>
+            <column name="status" value ="COMPLETED"/>
+            <column name="date" value ="15.10.2024"/>
+            <column name="price" value ="25.0"/>
+        </insert>
+
+<!--        <addForeignKeyConstraint-->
+<!--                baseColumnNames="driver_id"-->
+<!--                baseTableName="Ride"-->
+<!--                constraintName="fk_Ride_to_driver"-->
+<!--                referencedColumnNames="id"-->
+<!--                referencedTableName="driver"/>-->
+
+<!--        <addForeignKeyConstraint-->
+<!--                baseColumnNames="passenger_id"-->
+<!--                baseTableName="Ride"-->
+<!--                constraintName="fk_Ride_to_passenger"-->
+<!--                referencedColumnNames="id"-->
+<!--                referencedTableName="passenger"/>-->
+
+        <rollback>
+            <dropTable tableName="ride"/>
+            <dropAllForeignKeyConstraints baseTableName="ride"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
