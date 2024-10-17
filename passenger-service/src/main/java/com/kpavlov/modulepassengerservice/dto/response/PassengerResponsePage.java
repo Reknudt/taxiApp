@@ -13,5 +13,5 @@ public record PassengerResponsePage (
 
         int totalPages,
 
-        long limit
+        int limit
 ) {}
