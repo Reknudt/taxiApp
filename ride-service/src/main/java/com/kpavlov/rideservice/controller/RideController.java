@@ -4,6 +4,7 @@ import com.kpavlov.rideservice.dto.request.create.RideCreateRequest;
 import com.kpavlov.rideservice.dto.request.update.RideUpdateRequest;
 import com.kpavlov.rideservice.dto.response.RideResponse;
 import com.kpavlov.rideservice.dto.response.RideResponsePage;
+import com.kpavlov.rideservice.model.RideStatus;
 import com.kpavlov.rideservice.service.RideService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -32,38 +33,37 @@ public class RideController {
         return rideService.updateRide(id, updateRideRequest);
     }
 
-    @PutMapping("/{id}/completed")
-    public void updateStatusCompleted(
-            @PathVariable Long id) {
-        rideService.updateStatusCompleted(id);
-    }
-
-    @PutMapping("/{id}/accepted")
-    public void updateStatusActivated(
-            @PathVariable Long id) {
-        rideService.updateStatusAccepted(id);
-    }
-
-    @PutMapping("/{id}/to_passenger")
-    public void updateStatusOnTheWayToPassenger(
-            @PathVariable Long id) {
-        rideService.updateStatusOnTheWayToPassenger(id);
-    }
-
-    @PutMapping("/{id}/to_destination")
-    public void updateStatusOnTheWayToDestination(
-            @PathVariable Long id) {
-        rideService.updateStatusOnTheWayToDestination(id);
-    }
-
-    @PutMapping("/{id}/cancelled")
-    public void updateStatusCancelled(@PathVariable Long id) {
-        rideService.updateStatusCancelled(id);
+    @PatchMapping("/{id}")
+    public void updateStatus(
+            @PathVariable Long id,
+            @RequestParam RideStatus status) {
+        rideService.updateStatus(id, status);
     }
 
     @GetMapping("/{id}")
     public RideResponse getById(@PathVariable Long id) {
         return rideService.getRideById(id);
+    }
+
+    @GetMapping("/{id}/driver")
+    public RideResponsePage getByDriverId(@PathVariable Long id,
+                                          @RequestParam(value = "offset", defaultValue = "0") @Min(0) Integer offset,
+                                          @RequestParam(value = "limit", defaultValue = "20") @Min(1) @Max(100) Integer limit){
+        return rideService.getRideByDriverId(id, offset, limit);
+    }
+
+    @GetMapping("/{id}/passenger")
+    public RideResponsePage getByPassengerId(@PathVariable Long id,
+                                @RequestParam(value = "offset", defaultValue = "0") @Min(0) Integer offset,
+                                @RequestParam(value = "limit", defaultValue = "20") @Min(1) @Max(100) Integer limit) {
+        return rideService.getRideByPassengerId(id, offset, limit);
+    }
+
+    @GetMapping("/{status}")
+    public RideResponsePage getByStatus(@PathVariable RideStatus status,
+                                    @RequestParam(value = "offset", defaultValue = "0") @Min(0) Integer offset,
+                                    @RequestParam(value = "limit", defaultValue = "20") @Min(1) @Max(100) Integer limit){
+        return rideService.getRideByStatus(status, offset, limit);
     }
 
     @DeleteMapping("/{id}")
@@ -74,7 +74,7 @@ public class RideController {
 
     @GetMapping
     public RideResponsePage getAllRides(@RequestParam(value = "offset", defaultValue = "0") @Min(0) Integer offset,
-                                                  @RequestParam(value = "limit", defaultValue = "20") @Min(1) @Max(100) Integer limit) {
+                                        @RequestParam(value = "limit", defaultValue = "20") @Min(1) @Max(100) Integer limit) {
         return rideService.getAllRides(offset, limit);
     }
 }
