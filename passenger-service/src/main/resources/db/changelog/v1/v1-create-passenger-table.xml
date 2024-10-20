@@ -28,13 +28,6 @@
             </column>
         </createTable>
 
-        <insert tableName="passenger">
-            <column name="name" value ="Arthur"/>
-            <column name="email" value ="sobak@gmail.com"/>
-            <column name="phone" value ="+375292222333"/>
-            <column name="status" value ="NOT_IN_RIDE"/>
-        </insert>
-
         <rollback>
             <dropTable tableName="passenger"/>
         </rollback>

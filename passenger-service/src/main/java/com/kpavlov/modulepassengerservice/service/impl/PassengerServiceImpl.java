@@ -12,6 +12,7 @@ import com.kpavlov.modulepassengerservice.model.Passenger;
 import com.kpavlov.modulepassengerservice.model.PassengerStatus;
 import com.kpavlov.modulepassengerservice.repository.PassengerRepository;
 import com.kpavlov.modulepassengerservice.service.PassengerService;
+import com.kpavlov.modulepassengerservice.validator.PassengerValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -34,11 +35,12 @@ public class PassengerServiceImpl implements PassengerService {
     private final PassengerMapper passengerMapper;
     private final PassengerPageMapper passengerPageMapper;
     private final MessageSource messageSource;
+    private final PassengerValidator passengerValidator;
 
     @Override
     @Transactional
     public PassengerResponse createPassenger(PassengerCreateRequest createPassengerRequest) {
-        checkCreatePassengerData(createPassengerRequest);
+        passengerValidator.checkCreatePassengerData(createPassengerRequest);
 
         Passenger passenger = passengerMapper.createRequestToEntity(createPassengerRequest);
         return passengerMapper.toResponse(passengerRepository.save(passenger));
@@ -49,7 +51,7 @@ public class PassengerServiceImpl implements PassengerService {
     public PassengerResponse updatePassenger(Long id, PassengerUpdateRequest updatePassengerRequest) {
         Passenger passenger = findPassengerByIdOrThrow(id);
 
-        checkUpdatePassengerData(updatePassengerRequest, passenger);
+        passengerValidator.checkUpdatePassengerData(updatePassengerRequest, passenger);
 
         passengerMapper.updatePassengerFromUpdateRequest(updatePassengerRequest, passenger);
         return passengerMapper.toResponse(passengerRepository.save(passenger));
@@ -81,47 +83,9 @@ public class PassengerServiceImpl implements PassengerService {
 
         List<PassengerResponse> passengerResponses = passengerPage.getContent().stream()
                 .map(passengerMapper::toResponse)
-                .collect(Collectors.toList());
+                .toList();
 
         return passengerPageMapper.toPassengerResponsePage(passengerResponses, passengerPage, limit);
-    }
-
-    private void checkCreatePassengerData(PassengerCreateRequest createPassengerRequest){
-        if (passengerRepository.existsByEmail(createPassengerRequest.email())) {
-            String email = createPassengerRequest.email();
-
-            throw new DuplicateFoundException(messageSource.getMessage(
-                    ERROR_DUPLICATE_EMAIL,
-                    new Object[]{email},
-                    LocaleContextHolder.getLocale()));
-        }
-        if (passengerRepository.existsByPhone(createPassengerRequest.phone())) {
-            String phone = createPassengerRequest.phone();
-
-            throw new DuplicateFoundException(messageSource.getMessage(
-                    ERROR_DUPLICATE_PHONE,
-                    new Object[]{phone},
-                    LocaleContextHolder.getLocale()));
-        }
-    }
-
-    private void checkUpdatePassengerData(PassengerUpdateRequest updatePassengerRequest, Passenger existingPassenger) {
-        if (!updatePassengerRequest.email().equals(existingPassenger.getEmail()) && passengerRepository.existsByEmail(updatePassengerRequest.email())) {
-            String email = updatePassengerRequest.email();
-
-            throw new DuplicateFoundException(messageSource.getMessage(
-                    ERROR_DUPLICATE_EMAIL,
-                    new Object[]{email},
-                    LocaleContextHolder.getLocale()));
-        }
-        if (!updatePassengerRequest.phone().equals(existingPassenger.getPhone()) && passengerRepository.existsByPhone(updatePassengerRequest.phone())) {
-            String phone = updatePassengerRequest.phone();
-
-            throw new DuplicateFoundException(messageSource.getMessage(
-                    ERROR_DUPLICATE_PHONE,
-                    new Object[]{phone},
-                    LocaleContextHolder.getLocale()));
-        }
     }
 
     private Passenger findPassengerByIdOrThrow(Long id) {

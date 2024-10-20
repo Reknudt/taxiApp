@@ -12,5 +12,7 @@ import java.util.List;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface PassengerPageMapper {
 
-    PassengerResponsePage toPassengerResponsePage(List<PassengerResponse> passengerResponses, Page<Passenger> passengerPage, int limit);
+    PassengerResponsePage toPassengerResponsePage(List<PassengerResponse> passengerResponses,
+                                                  Page<Passenger> passengerPage,
+                                                  int limit);
 }
