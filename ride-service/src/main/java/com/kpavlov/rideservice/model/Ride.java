@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Setter
 @Getter
@@ -46,7 +46,7 @@ public class Ride {
 
     @Column(nullable = false)
     @Temporal(TemporalType.DATE)
-    LocalDate date;
+    LocalDateTime date;
 
     @Column(nullable = false)
     BigDecimal price;

@@ -14,7 +14,5 @@ public final class ErrorMessages {
 
     public static final String  ERROR_NOT_FOUND = "error.not.found";
 
-    public static final String  ERROR_DRIVER_NOT_EXISTS = "error.duplicate.driver";
-
-    public static final String  ERROR_PASSENGER_NOT_EXISTS = "error.duplicate.passenger";
+    public static final String  ERROR_NO_WAY = "error.no.way";
 }
