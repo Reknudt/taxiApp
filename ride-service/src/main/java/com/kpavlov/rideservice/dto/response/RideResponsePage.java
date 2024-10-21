@@ -5,15 +5,13 @@ import lombok.Getter;
 
 import java.util.List;
 
-@Getter
-@AllArgsConstructor
-public class RideResponsePage {
+public record RideResponsePage (
 
-    private List<RideResponse> rides;
+        List<RideResponse> rideResponses,
 
-    private int currentPage;
+        int currentPage,
 
-    private int totalPages;
+        int totalPages,
 
-    private int limit;
-}
+        int limit
+) {}

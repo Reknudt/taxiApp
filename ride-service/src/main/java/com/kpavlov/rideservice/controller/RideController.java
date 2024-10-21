@@ -59,8 +59,8 @@ public class RideController {
         return rideService.getRideByPassengerId(id, offset, limit);
     }
 
-    @GetMapping("/{status}")
-    public RideResponsePage getByStatus(@PathVariable RideStatus status,
+    @GetMapping("/status")
+    public RideResponsePage getByStatus(@RequestParam RideStatus status,
                                     @RequestParam(value = "offset", defaultValue = "0") @Min(0) Integer offset,
                                     @RequestParam(value = "limit", defaultValue = "20") @Min(1) @Max(100) Integer limit){
         return rideService.getRideByStatus(status, offset, limit);
@@ -68,7 +68,13 @@ public class RideController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteRide(@PathVariable Long id) {
+    public void softDeleteRide(@PathVariable Long id) {
+        rideService.softDeleteRide(id);
+    }
+
+    @DeleteMapping("/{id}/hard")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteDriver(@PathVariable Long id) {
         rideService.deleteRide(id);
     }
 
