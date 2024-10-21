@@ -1,0 +1,15 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${PG_URL}
+    username: ${PG_USERNAME}
+    password: ${PG_PASSWORD}
+
+  liquibase:
+    change-log: classpath:db/changelog/main-changelog.xml
+
+  messages:
+    basename: messages
