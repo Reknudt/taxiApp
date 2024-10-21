@@ -5,16 +5,20 @@ import com.kpavlov.modulepassengerservice.dto.request.update.PassengerUpdateRequ
 import com.kpavlov.modulepassengerservice.exception.DuplicateFoundException;
 import com.kpavlov.modulepassengerservice.model.Passenger;
 import com.kpavlov.modulepassengerservice.repository.PassengerRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.stereotype.Component;
 
 import static com.kpavlov.modulepassengerservice.util.ErrorMessages.ERROR_DUPLICATE_EMAIL;
 import static com.kpavlov.modulepassengerservice.util.ErrorMessages.ERROR_DUPLICATE_PHONE;
 
+@Component
+@RequiredArgsConstructor
 public class PassengerValidator {
 
-    private PassengerRepository passengerRepository;
-    private MessageSource messageSource;
+    private final PassengerRepository passengerRepository;
+    private final MessageSource messageSource;
 
     public void checkCreatePassengerData(PassengerCreateRequest createPassengerRequest) {
         if (passengerRepository.existsByEmail(createPassengerRequest.email())) {
