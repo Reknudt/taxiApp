@@ -45,7 +45,7 @@ public class Ride {
     private RideStatus status;
 
     @Column(nullable = false)
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     LocalDateTime date;
 
     @Column(nullable = false)

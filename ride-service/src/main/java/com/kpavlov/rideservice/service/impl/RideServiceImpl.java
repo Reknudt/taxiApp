@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -71,6 +70,14 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
+    @Transactional
+    public void softDeleteRide(Long id) {
+        Ride ride = findRideByIdOrThrow(id);
+        ride.setStatus(RideStatus.DELETED);
+        rideMapper.toResponse(rideRepository.save(ride));
+    }
+
+    @Override
     public RideResponse getRideById(Long id) {
         Ride ride = findRideByIdOrThrow(id);
         return rideMapper.toResponse(ride);
@@ -82,7 +89,7 @@ public class RideServiceImpl implements RideService {
 
         List<RideResponse> rideResponses = ridePage.getContent().stream()
                 .map(rideMapper::toResponse)
-                .collect(Collectors.toList());
+                .toList();
 
         return ridePageMapper.toRideResponsePage(rideResponses, ridePage, limit);
     }
@@ -93,7 +100,7 @@ public class RideServiceImpl implements RideService {
 
         List<RideResponse> rideResponses = ridePage.getContent().stream()
                 .map(rideMapper::toResponse)
-                .collect(Collectors.toList());
+                .toList();
 
         return ridePageMapper.toRideResponsePage(rideResponses, ridePage, limit);
     }
@@ -104,7 +111,7 @@ public class RideServiceImpl implements RideService {
 
         List<RideResponse> rideResponses = ridePage.getContent().stream()
                 .map(rideMapper::toResponse)
-                .collect(Collectors.toList());
+                .toList();
 
         return ridePageMapper.toRideResponsePage(rideResponses, ridePage, limit);
     }
@@ -115,7 +122,7 @@ public class RideServiceImpl implements RideService {
 
         List<RideResponse> rideResponses = ridePage.getContent().stream()
                 .map(rideMapper::toResponse)
-                .collect(Collectors.toList());
+                .toList();
 
         return ridePageMapper.toRideResponsePage(rideResponses, ridePage, limit);
     }

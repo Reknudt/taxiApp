@@ -3,13 +3,13 @@ package com.kpavlov.rideservice.dto.response;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public record RideResponse(
+public record RideResponse (
 
-        Long id,
+        long id,
 
-        Long driverId,
+        long driverId,
 
-        Long passengerId,
+        long passengerId,
 
         String addressDeparture,
 

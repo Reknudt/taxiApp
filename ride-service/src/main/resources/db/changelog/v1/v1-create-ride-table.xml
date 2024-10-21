@@ -37,30 +37,6 @@
             </column>
         </createTable>
 
-        <insert tableName="ride">
-            <column name="driver_id" value ="2"/>
-            <column name="passenger_id" value ="1"/>
-            <column name="address_departure" value ="Vitebsk, Lenin street, 23"/>
-            <column name="address_destination" value ="Minsk, Soltysa street, 12"/>
-            <column name="status" value ="COMPLETED"/>
-            <column name="date" value ="15.10.2024"/>
-            <column name="price" value ="25.0"/>
-        </insert>
-
-<!--        <addForeignKeyConstraint-->
-<!--                baseColumnNames="driver_id"-->
-<!--                baseTableName="Ride"-->
-<!--                constraintName="fk_Ride_to_driver"-->
-<!--                referencedColumnNames="id"-->
-<!--                referencedTableName="driver"/>-->
-
-<!--        <addForeignKeyConstraint-->
-<!--                baseColumnNames="passenger_id"-->
-<!--                baseTableName="Ride"-->
-<!--                constraintName="fk_Ride_to_passenger"-->
-<!--                referencedColumnNames="id"-->
-<!--                referencedTableName="passenger"/>-->
-
         <rollback>
             <dropTable tableName="ride"/>
             <dropAllForeignKeyConstraints baseTableName="ride"/>

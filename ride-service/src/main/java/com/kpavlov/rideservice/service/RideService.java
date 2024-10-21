@@ -14,6 +14,8 @@ public interface RideService {
 
     void deleteRide(Long id);
 
+    void softDeleteRide(Long id);
+
     void updateStatus(Long id, RideStatus status);
 
     RideResponse getRideById(Long id);
