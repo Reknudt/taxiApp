@@ -46,7 +46,7 @@ public class RideServiceImpl implements RideService {
 
     @Override
     @Transactional
-    public RideResponse updateRide(Long id, RideUpdateRequest updateRideRequest) {
+    public RideResponse updateRide(long id, RideUpdateRequest updateRideRequest) {
         Ride ride = findRideByIdOrThrow(id);
 
         checkUpdateRideData(updateRideRequest, ride);
@@ -57,7 +57,7 @@ public class RideServiceImpl implements RideService {
 
     @Override
     @Transactional
-    public void updateStatus(Long id, RideStatus status) {
+    public void updateStatus(long id, RideStatus status) {
         Ride ride = findRideByIdOrThrow(id);
         ride.setStatus(status);
         rideMapper.toResponse(rideRepository.save(ride));
@@ -65,20 +65,20 @@ public class RideServiceImpl implements RideService {
 
     @Override
     @Transactional
-    public void deleteRide(Long id) {
+    public void deleteRide(long id) {
         rideRepository.deleteById(id);
     }
 
     @Override
     @Transactional
-    public void softDeleteRide(Long id) {
+    public void softDeleteRide(long id) {
         Ride ride = findRideByIdOrThrow(id);
         ride.setStatus(RideStatus.DELETED);
         rideMapper.toResponse(rideRepository.save(ride));
     }
 
     @Override
-    public RideResponse getRideById(Long id) {
+    public RideResponse getRideById(long id) {
         Ride ride = findRideByIdOrThrow(id);
         return rideMapper.toResponse(ride);
     }
@@ -95,7 +95,7 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
-    public RideResponsePage getRideByPassengerId(Long id, int offset, int limit) {
+    public RideResponsePage getRideByPassengerId(long id, int offset, int limit) {
         Page<Ride> ridePage = rideRepository.findAllByPassengerId(id, PageRequest.of(offset, limit));
 
         List<RideResponse> rideResponses = ridePage.getContent().stream()
@@ -106,7 +106,7 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
-    public RideResponsePage getRideByDriverId(Long id, int offset, int limit) {
+    public RideResponsePage getRideByDriverId(long id, int offset, int limit) {
         Page<Ride> ridePage = rideRepository.findAllByDriverId(id, PageRequest.of(offset, limit));
 
         List<RideResponse> rideResponses = ridePage.getContent().stream()
@@ -141,7 +141,7 @@ public class RideServiceImpl implements RideService {
         }
     }
 
-    private Ride findRideByIdOrThrow(Long id) {
+    private Ride findRideByIdOrThrow(long id) {
         return rideRepository.findById(id)
                 .orElseThrow(
                         () -> new RideNotFoundException(messageSource.getMessage(

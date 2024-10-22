@@ -10,21 +10,21 @@ public interface RideService {
 
     RideResponse createRide(RideCreateRequest createRideRequest);
 
-    RideResponse updateRide(Long id, RideUpdateRequest updateRideRequest);
+    RideResponse updateRide(long id, RideUpdateRequest updateRideRequest);
 
-    void deleteRide(Long id);
+    void deleteRide(long id);
 
-    void softDeleteRide(Long id);
+    void softDeleteRide(long id);
 
-    void updateStatus(Long id, RideStatus status);
+    void updateStatus(long id, RideStatus status);
 
-    RideResponse getRideById(Long id);
+    RideResponse getRideById(long id);
 
     RideResponsePage getRideByStatus(RideStatus status, int offset, int limit);
 
-    RideResponsePage getRideByPassengerId(Long id, int offset, int limit);
+    RideResponsePage getRideByPassengerId(long id, int offset, int limit);
 
-    RideResponsePage getRideByDriverId(Long id, int offset, int limit);
+    RideResponsePage getRideByDriverId(long id, int offset, int limit);
 
     RideResponsePage getAllRides(int offset, int limit);
 }

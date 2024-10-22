@@ -26,13 +26,13 @@ public class Ride {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
 
     @Column(nullable = false)
-    private Long driverId;
+    private long driverId;
 
     @Column(nullable = false)
-    private Long passengerId;
+    private long passengerId;
 
     @Column(nullable = false)
     private String addressDeparture;

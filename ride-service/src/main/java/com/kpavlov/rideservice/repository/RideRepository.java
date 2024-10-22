@@ -12,11 +12,11 @@ import java.util.Optional;
 @Repository
 public interface RideRepository extends JpaRepository<Ride, Long> {
 
-    Optional<Ride> findById(Long id);
+    Optional<Ride> findById(long id);
 
     Page findAllByStatus(RideStatus status, Pageable pageable);
 
-    Page findAllByPassengerId(Long passengerId, Pageable pageable);
+    Page findAllByPassengerId(long passengerId, Pageable pageable);
 
-    Page<Ride> findAllByDriverId(Long driverId, Pageable pageable);
+    Page findAllByDriverId(long driverId, Pageable pageable);
 }

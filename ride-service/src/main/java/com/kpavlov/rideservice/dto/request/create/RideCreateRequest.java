@@ -8,10 +8,10 @@ import java.time.LocalDateTime;
 public record RideCreateRequest(
 
         @NotNull(message = "{field.required}")
-        Long driverId,
+        long driverId,
 
         @NotNull(message = "{field.required}")
-        Long passengerId,
+        long passengerId,
 
         @NotBlank(message = "{field.required}")
         String addressDeparture,

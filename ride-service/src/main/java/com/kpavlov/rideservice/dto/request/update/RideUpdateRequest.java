@@ -3,16 +3,15 @@ package com.kpavlov.rideservice.dto.request.update;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public record RideUpdateRequest(
 
         @NotNull(message = "{field.required}")
-        Long driverId,
+        long driverId,
 
         @NotNull(message = "{field.required}")
-        Long passengerId,
+        long passengerId,
 
         @NotBlank(message = "{field.required}")
         String addressDeparture,
