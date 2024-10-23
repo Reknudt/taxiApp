@@ -6,6 +6,7 @@ import com.kpavlov.ratingservice.dto.response.RatingResponse;
 import com.kpavlov.ratingservice.dto.response.RatingResponsePage;
 import com.kpavlov.ratingservice.exception.RatingNotFoundException;
 import com.kpavlov.ratingservice.mapper.RatingMapper;
+import com.kpavlov.ratingservice.mapper.RatingPageMapper;
 import com.kpavlov.ratingservice.model.Rating;
 import com.kpavlov.ratingservice.repository.RatingRepository;
 import com.kpavlov.ratingservice.service.RatingService;
@@ -27,14 +28,15 @@ public class RatingServiceImpl implements RatingService {
 
     private final RatingRepository ratingRepository;
     private final RatingMapper ratingMapper;
+
+    private final RatingPageMapper ratingPageMapper;
+
     private final MessageSource messageSource;
-    //private final DriverRepository driverRepository;
-    //private final PassengerRepository passengerRepository;
 
     @Override
     @Transactional
     public RatingResponse createRating(RatingCreateRequest createRatingRequest) {
-        //checkCreateRatingData(createRatingRequest);
+        checkCreateRatingData(createRatingRequest);
 
         Rating rating = ratingMapper.createRequestToEntity(createRatingRequest);
 
@@ -46,7 +48,7 @@ public class RatingServiceImpl implements RatingService {
     public RatingResponse updateRating(Long id, RatingUpdateRequest updateRatingRequest) {
         Rating rating = findRatingByIdOrThrow(id);
 
-        //checkUpdateRatingData(updateRatingRequest, Rating);
+        checkUpdateRatingData(updateRatingRequest, rating);
 
         ratingMapper.updateRatingFromUpdateRequest(updateRatingRequest, rating);
         return ratingMapper.toResponse(ratingRepository.save(rating));
@@ -54,11 +56,22 @@ public class RatingServiceImpl implements RatingService {
 
     @Override
     @Transactional
-    public RatingResponse updateRate(Long id, int rate) {
+    public void updateDriverRate(Long id, int rate) {
+        Rating rating = ratingRepository.findAllByDriverId(id);
+
+        rating.setPassengerRate(rate);
+
+        ratingMapper.toResponse(ratingRepository.save(rating));
+    }
+
+    @Override
+    @Transactional
+    public void updatePassengerRate(Long id, int rate) {
         Rating rating = findRatingByIdOrThrow(id);
 
-        rating.setRate(rate);
-        return ratingMapper.toResponse(ratingRepository.save(rating));
+        rating.setPassengerRate(rate);
+
+        ratingMapper.toResponse(ratingRepository.save(rating));
     }
 
     @Override
@@ -74,6 +87,16 @@ public class RatingServiceImpl implements RatingService {
     }
 
     @Override
+    public RatingResponsePage getRatingByDriverId(Long id) {
+        return null;
+    }
+
+    @Override
+    public RatingResponsePage getRatingByPassengerId(Long id) {
+        return null;
+    }
+
+    @Override
     public RatingResponsePage getAllRatings(int offset, int limit) {
         Page<Rating> ratingPage = ratingRepository.findAll(PageRequest.of(offset, limit));
 
@@ -84,42 +107,10 @@ public class RatingServiceImpl implements RatingService {
         return new RatingResponsePage(ratingResponse, ratingPage.getNumber(), ratingPage.getTotalPages(), ratingPage.getTotalElements());
     }
 
-//    private void checkCreateRatingData(RatingCreateRequest createRatingRequest){
-//        if (driverRepository.existsById(createRatingRequest.driverId())) {
-//            Long driverId = createRatingRequest.driverId();
-//
-//            throw new DuplicateFoundException(messageSource.getMessage(
-//                    ERROR_DRIVER_NOT_EXISTS,
-//                    new Object[]{driverId},
-//                    null));
-//        }
-//        if (passengerRepository.existsById(createRatingRequest.passengerId())) {
-//            Long passengerId = createRatingRequest.passengerId();
-//
-//            throw new DuplicateFoundException(messageSource.getMessage(
-//                    ERROR_PASSENGER_NOT_EXISTS,
-//                    new Object[]{passengerId},
-//                    null));
-//        }
-//    }
-//
-//    private void checkUpdateRatingData(RatingUpdateRequest updateRatingRequest, Rating existingRating) {
-//        if (!updateRatingRequest.driverId().equals(existingRating.getDriverId()) && driverRepository.existsById(updateRatingRequest.driverId())) {
-//            Long driverId = updateRatingRequest.driverId();
-//
-//            throw new DuplicateFoundException(messageSource.getMessage(
-//                    ERROR_DRIVER_NOT_EXISTS,
-//                    new Object[]{driverId},
-//                    null));        }
-//        if (!updateRatingRequest.passengerId().equals(existingRating.getPassengerId()) && passengerRepository.existsById(updateRatingRequest.passengerId())) {
-//            Long passengerId = updateRatingRequest.passengerId();
-//
-//            throw new DuplicateFoundException(messageSource.getMessage(
-//                    ERROR_PASSENGER_NOT_EXISTS,
-//                    new Object[]{passengerId},
-//                    null));
-//        }
-//    }
+    private void checkCreateRatingData(RatingCreateRequest createRatingRequest){}
+
+    private void checkUpdateRatingData(RatingUpdateRequest updateRatingRequest,
+                                       Rating existingRating) {}
 
     private Rating findRatingByIdOrThrow(Long id) {
         return ratingRepository.findById(id)

@@ -11,11 +11,17 @@ public interface RatingService {
 
     RatingResponse updateRating(Long id, RatingUpdateRequest updateRatingRequest);
 
-    RatingResponse updateRate(Long id, int rate);
+    void updateDriverRate(Long id, int rate);
+
+    void updatePassengerRate(Long id, int rate);
 
     void deleteRating(Long id);
 
     RatingResponse getRatingById(Long id);
+
+    RatingResponsePage getRatingByDriverId(Long id);
+
+    RatingResponsePage getRatingByPassengerId(Long id);
 
     RatingResponsePage getAllRatings(int offset, int limit);
 }
