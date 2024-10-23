@@ -20,11 +20,11 @@ public interface RideService {
 
     RideResponse getRideById(long id);
 
-    RideResponsePage getRideByStatus(RideStatus status, int offset, int limit);
+    RideResponsePage findRidesByStatus(RideStatus status, int offset, int limit);
 
-    RideResponsePage getRideByPassengerId(long id, int offset, int limit);
+    RideResponsePage findRidesByPassengerId(long id, int offset, int limit);
 
-    RideResponsePage getRideByDriverId(long id, int offset, int limit);
+    RideResponsePage findRidesByDriverId(long id, int offset, int limit);
 
     RideResponsePage getAllRides(int offset, int limit);
 }

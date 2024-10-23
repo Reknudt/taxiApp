@@ -11,7 +11,23 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import static com.kpavlov.rideservice.util.NumberValues.DEFAULT_LIMIT;
+import static com.kpavlov.rideservice.util.NumberValues.DEFAULT_OFFSET;
+import static com.kpavlov.rideservice.util.NumberValues.MAX_LIMIT;
+import static com.kpavlov.rideservice.util.NumberValues.MIN_LIMIT;
+import static com.kpavlov.rideservice.util.NumberValues.MIN_OFFSET;
 
 @RequiredArgsConstructor
 @RestController
@@ -47,23 +63,29 @@ public class RideController {
 
     @GetMapping("/{id}/driver")
     public RideResponsePage getByDriverId(@PathVariable long id,
-                                          @RequestParam(value = "offset", defaultValue = "0") @Min(0) Integer offset,
-                                          @RequestParam(value = "limit", defaultValue = "20") @Min(1) @Max(100) Integer limit){
-        return rideService.getRideByDriverId(id, offset, limit);
+                                          @RequestParam(value = "offset", defaultValue = DEFAULT_OFFSET)
+                                          @Min(MIN_OFFSET) Integer offset,
+                                          @RequestParam(value = "limit", defaultValue = DEFAULT_LIMIT)
+                                              @Min(MIN_LIMIT) @Max(MAX_LIMIT) Integer limit) {
+        return rideService.findRidesByDriverId(id, offset, limit);
     }
 
     @GetMapping("/{id}/passenger")
     public RideResponsePage getByPassengerId(@PathVariable long id,
-                                @RequestParam(value = "offset", defaultValue = "0") @Min(0) Integer offset,
-                                @RequestParam(value = "limit", defaultValue = "20") @Min(1) @Max(100) Integer limit) {
-        return rideService.getRideByPassengerId(id, offset, limit);
+                                             @RequestParam(value = "offset", defaultValue = DEFAULT_OFFSET)
+                                             @Min(MIN_OFFSET) Integer offset,
+                                             @RequestParam(value = "limit", defaultValue = DEFAULT_LIMIT)
+                                                 @Min(MIN_LIMIT) @Max(MAX_LIMIT) Integer limit) {
+        return rideService.findRidesByPassengerId(id, offset, limit);
     }
 
     @GetMapping("/status")
     public RideResponsePage getByStatus(@RequestParam RideStatus status,
-                                    @RequestParam(value = "offset", defaultValue = "0") @Min(0) Integer offset,
-                                    @RequestParam(value = "limit", defaultValue = "20") @Min(1) @Max(100) Integer limit){
-        return rideService.getRideByStatus(status, offset, limit);
+                                        @RequestParam(value = "offset", defaultValue = DEFAULT_OFFSET)
+                                        @Min(MIN_OFFSET) Integer offset,
+                                        @RequestParam(value = "limit", defaultValue = DEFAULT_LIMIT)
+                                            @Min(MIN_LIMIT) @Max(MAX_LIMIT) Integer limit) {
+        return rideService.findRidesByStatus(status, offset, limit);
     }
 
     @DeleteMapping("/{id}")
@@ -79,8 +101,10 @@ public class RideController {
     }
 
     @GetMapping
-    public RideResponsePage getAllRides(@RequestParam(value = "offset", defaultValue = "0") @Min(0) Integer offset,
-                                        @RequestParam(value = "limit", defaultValue = "20") @Min(1) @Max(100) Integer limit) {
+    public RideResponsePage getAllRides(@RequestParam(value = "offset", defaultValue = DEFAULT_OFFSET)
+                                            @Min(MIN_OFFSET) Integer offset,
+                                        @RequestParam(value = "limit", defaultValue = DEFAULT_LIMIT)
+                                            @Min(MIN_LIMIT) @Max(MAX_LIMIT) Integer limit) {
         return rideService.getAllRides(offset, limit);
     }
 }

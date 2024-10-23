@@ -1,8 +1,6 @@
 package com.kpavlov.rideservice.service.impl;
 
-import static com.kpavlov.rideservice.util.ErrorMessages.ERROR_NOT_FOUND;
-import static com.kpavlov.rideservice.util.ErrorMessages.ERROR_NO_WAY;
-
+import com.kpavlov.rideservice.controller.ControllerAdvice;
 import com.kpavlov.rideservice.dto.request.create.RideCreateRequest;
 import com.kpavlov.rideservice.dto.request.update.RideUpdateRequest;
 import com.kpavlov.rideservice.dto.response.RideResponse;
@@ -16,8 +14,6 @@ import com.kpavlov.rideservice.model.RideStatus;
 import com.kpavlov.rideservice.repository.RideRepository;
 import com.kpavlov.rideservice.service.RideService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -32,7 +28,7 @@ public class RideServiceImpl implements RideService {
     private final RideRepository rideRepository;
     private final RideMapper rideMapper;
     private final RidePageMapper ridePageMapper;
-    private final MessageSource messageSource;
+    private final ControllerAdvice controllerAdvice;
 
     @Override
     @Transactional
@@ -41,30 +37,32 @@ public class RideServiceImpl implements RideService {
 
         Ride ride = rideMapper.createRequestToEntity(createRideRequest);
         ride.setStatus(RideStatus.CREATED);
-        return rideMapper.toResponse(rideRepository.save(ride));
+        rideRepository.save(ride);
+        return rideMapper.toResponse(ride);
     }
 
     @Override
     @Transactional
     public RideResponse updateRide(long id, RideUpdateRequest updateRideRequest) {
-        Ride ride = findRideByIdOrThrow(id);
+        Ride ride = findRideById(id);
 
         checkUpdateRideData(updateRideRequest, ride);
 
         rideMapper.updateRideFromUpdateRequest(updateRideRequest, ride);
-        return rideMapper.toResponse(rideRepository.save(ride));
+        rideRepository.save(ride);
+        return rideMapper.toResponse(ride);
     }
 
     @Override
     @Transactional
     public void updateStatus(long id, RideStatus status) {
-        Ride ride = findRideByIdOrThrow(id);
+        Ride ride = findRideById(id);
         ride.setStatus(status);
-        rideMapper.toResponse(rideRepository.save(ride));
+        rideRepository.save(ride);
+        rideMapper.toResponse(ride);
     }
 
     @Override
-    @Transactional
     public void deleteRide(long id) {
         rideRepository.deleteById(id);
     }
@@ -72,19 +70,20 @@ public class RideServiceImpl implements RideService {
     @Override
     @Transactional
     public void softDeleteRide(long id) {
-        Ride ride = findRideByIdOrThrow(id);
+        Ride ride = findRideById(id);
         ride.setStatus(RideStatus.DELETED);
-        rideMapper.toResponse(rideRepository.save(ride));
+        rideRepository.save(ride);
+        rideMapper.toResponse(ride);
     }
 
     @Override
     public RideResponse getRideById(long id) {
-        Ride ride = findRideByIdOrThrow(id);
+        Ride ride = findRideById(id);
         return rideMapper.toResponse(ride);
     }
 
     @Override
-    public RideResponsePage getRideByStatus(RideStatus status, int offset, int limit) {
+    public RideResponsePage findRidesByStatus(RideStatus status, int offset, int limit) {
         Page<Ride> ridePage = rideRepository.findAllByStatus(status, PageRequest.of(offset, limit));
 
         List<RideResponse> rideResponses = ridePage.getContent().stream()
@@ -95,7 +94,7 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
-    public RideResponsePage getRideByPassengerId(long id, int offset, int limit) {
+    public RideResponsePage findRidesByPassengerId(long id, int offset, int limit) {
         Page<Ride> ridePage = rideRepository.findAllByPassengerId(id, PageRequest.of(offset, limit));
 
         List<RideResponse> rideResponses = ridePage.getContent().stream()
@@ -106,7 +105,7 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
-    public RideResponsePage getRideByDriverId(long id, int offset, int limit) {
+    public RideResponsePage findRidesByDriverId(long id, int offset, int limit) {
         Page<Ride> ridePage = rideRepository.findAllByDriverId(id, PageRequest.of(offset, limit));
 
         List<RideResponse> rideResponses = ridePage.getContent().stream()
@@ -127,26 +126,33 @@ public class RideServiceImpl implements RideService {
         return ridePageMapper.toRideResponsePage(rideResponses, ridePage, limit);
     }
 
-    private void checkCreateRideData(RideCreateRequest createRideRequest) {}
+    private void checkCreateRideData(RideCreateRequest createRideRequest) {
 
-    private void checkUpdateRideData(RideUpdateRequest updateRideRequest, Ride existingRide) {
+        String destination = createRideRequest.addressDestination();
+        String departure = createRideRequest.addressDeparture();
 
-        if (updateRideRequest.addressDestination().equals(updateRideRequest.addressDeparture())) {
-            String address = updateRideRequest.addressDestination();
-
-            throw new DuplicateFoundException(messageSource.getMessage(
-                    ERROR_NO_WAY,
-                    new Object[]{address},
-                    LocaleContextHolder.getLocale()));
+        if (destination.equals(departure)) {
+            throw new DuplicateFoundException(
+                    controllerAdvice.throwDuplicateFoundException(destination));
         }
     }
 
-    private Ride findRideByIdOrThrow(long id) {
+    private void checkUpdateRideData(RideUpdateRequest updateRideRequest, Ride existingRide) {
+
+        String destination = updateRideRequest.addressDestination();
+        String departure = updateRideRequest.addressDeparture();
+
+        if (destination.equals(departure)) {
+            throw new DuplicateFoundException(
+                    controllerAdvice.throwDuplicateFoundException(destination));
+        }
+    }
+
+    private Ride findRideById(long id) {
         return rideRepository.findById(id)
                 .orElseThrow(
-                        () -> new RideNotFoundException(messageSource.getMessage(
-                                ERROR_NOT_FOUND,
-                                new Object[]{id},
-                                LocaleContextHolder.getLocale())));
+                        () -> new RideNotFoundException(
+                                controllerAdvice.throwRideNotFoundException(id)));
+
     }
 }

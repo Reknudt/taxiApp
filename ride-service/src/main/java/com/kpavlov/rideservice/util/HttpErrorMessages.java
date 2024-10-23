@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class ErrorMessages {
+public final class HttpErrorMessages {
 
     public static final String VALIDATION_FAILED_MESSAGE = "Validation failed";
 
