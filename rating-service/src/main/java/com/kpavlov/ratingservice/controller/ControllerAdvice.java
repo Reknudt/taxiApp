@@ -63,10 +63,10 @@ public class ControllerAdvice {
     }
 
     @ExceptionHandler(DuplicateFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handlerDuplicateFound(DuplicateFoundException e) {
         return ErrorResponse.builder()
-                .status(HttpStatus.NOT_ACCEPTABLE.value())
+                .status(HttpStatus.CONFLICT.value())
                 .message(e.getMessage())
                 .build();
     }

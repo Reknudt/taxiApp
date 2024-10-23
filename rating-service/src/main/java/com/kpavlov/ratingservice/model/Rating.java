@@ -14,17 +14,26 @@ public class Rating {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
 
     @Column(nullable = false)
-    private Long driverId;
+    private long driverId;
 
     @Column(nullable = false)
-    private Long passengerId;
+    private long passengerId;
 
     @Column(nullable = false)
-    private Integer rate;
+    private long rideId;
+
+    @Column(nullable = false)
+    private int driverRate;
+
+    @Column(nullable = false)
+    private int passengerRate;
 
     @Column
-    private String comment;
+    private String driverComment;
+
+    @Column
+    private String passengerComment;
 }

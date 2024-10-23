@@ -2,13 +2,19 @@ package com.kpavlov.ratingservice.dto.response;
 
 public record RatingResponse(
 
-        Long id,
+        long id,
 
-        Long driverId,
+        long driverId,
 
-        Long passengerId,
+        long passengerId,
 
-        Integer rate,
+        long rideId,
 
-        String comment
+        int driverRate,
+
+        int passengerRate,
+
+        String driverComment,
+
+        String passengerComment
 ) {}
