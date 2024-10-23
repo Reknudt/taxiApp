@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class NumberValues {
+public class PaginationDefaultValues {
 
     public static final String DEFAULT_OFFSET = "0";
 

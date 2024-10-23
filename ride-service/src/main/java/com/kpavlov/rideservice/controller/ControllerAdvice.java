@@ -27,28 +27,17 @@ public class ControllerAdvice {
 
     private final MessageSource messageSource;
 
-    public String throwDuplicateFoundException(String destination) {
-        String message = messageSource.getMessage(
-                ERROR_NO_WAY,
-                new Object[]{destination},
-                LocaleContextHolder.getLocale());
-        return message;
-    }
-
-    public String throwRideNotFoundException(long id) {
-        String message = messageSource.getMessage(
-                ERROR_NOT_FOUND,
-                new Object[]{id},
-                LocaleContextHolder.getLocale());
-        return message;
-    }
-
     @ExceptionHandler(RideNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handlerResourceNotFound(RideNotFoundException e) {
+        String localizedMessage = messageSource.getMessage(
+                e.getMessage(),
+                new Object[]{e.getMessageKey()},
+                LocaleContextHolder.getLocale());
+
         return ErrorResponse.builder()
                 .status(HttpStatus.NOT_FOUND.value())
-                .message(e.getMessage())
+                .message(localizedMessage)
                 .build();
     }
 
@@ -90,9 +79,14 @@ public class ControllerAdvice {
     @ExceptionHandler(DuplicateFoundException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handlerDuplicateFound(DuplicateFoundException e) {
+        String localizedMessage = messageSource.getMessage(
+                e.getMessage(),
+                null,
+                LocaleContextHolder.getLocale());
+
         return ErrorResponse.builder()
                 .status(HttpStatus.CONFLICT.value())
-                .message(e.getMessage())
+                .message(localizedMessage)
                 .build();
     }
 }

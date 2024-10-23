@@ -23,11 +23,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.kpavlov.rideservice.util.NumberValues.DEFAULT_LIMIT;
-import static com.kpavlov.rideservice.util.NumberValues.DEFAULT_OFFSET;
-import static com.kpavlov.rideservice.util.NumberValues.MAX_LIMIT;
-import static com.kpavlov.rideservice.util.NumberValues.MIN_LIMIT;
-import static com.kpavlov.rideservice.util.NumberValues.MIN_OFFSET;
+import static com.kpavlov.rideservice.util.PaginationDefaultValues.DEFAULT_LIMIT;
+import static com.kpavlov.rideservice.util.PaginationDefaultValues.DEFAULT_OFFSET;
+import static com.kpavlov.rideservice.util.PaginationDefaultValues.MAX_LIMIT;
+import static com.kpavlov.rideservice.util.PaginationDefaultValues.MIN_LIMIT;
+import static com.kpavlov.rideservice.util.PaginationDefaultValues.MIN_OFFSET;
 
 @RequiredArgsConstructor
 @RestController

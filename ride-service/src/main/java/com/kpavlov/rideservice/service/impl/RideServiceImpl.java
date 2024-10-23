@@ -21,6 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.kpavlov.rideservice.util.HttpErrorMessages.ERROR_NOT_FOUND;
+import static com.kpavlov.rideservice.util.HttpErrorMessages.ERROR_NO_WAY;
+
 @Service
 @RequiredArgsConstructor
 public class RideServiceImpl implements RideService {
@@ -132,8 +135,7 @@ public class RideServiceImpl implements RideService {
         String departure = createRideRequest.addressDeparture();
 
         if (destination.equals(departure)) {
-            throw new DuplicateFoundException(
-                    controllerAdvice.throwDuplicateFoundException(destination));
+            throw new DuplicateFoundException(ERROR_NO_WAY);
         }
     }
 
@@ -143,16 +145,13 @@ public class RideServiceImpl implements RideService {
         String departure = updateRideRequest.addressDeparture();
 
         if (destination.equals(departure)) {
-            throw new DuplicateFoundException(
-                    controllerAdvice.throwDuplicateFoundException(destination));
+            throw new DuplicateFoundException(ERROR_NO_WAY);
         }
     }
 
     private Ride findRideById(long id) {
         return rideRepository.findById(id)
                 .orElseThrow(
-                        () -> new RideNotFoundException(
-                                controllerAdvice.throwRideNotFoundException(id)));
-
+                        () -> new RideNotFoundException(ERROR_NOT_FOUND, Long.toString(id)));
     }
 }
