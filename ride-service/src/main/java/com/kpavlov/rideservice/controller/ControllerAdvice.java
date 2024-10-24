@@ -18,9 +18,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
 
-import static com.kpavlov.rideservice.util.HttpErrorMessages.ERROR_NOT_FOUND;
-import static com.kpavlov.rideservice.util.HttpErrorMessages.ERROR_NO_WAY;
-
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class ControllerAdvice {
@@ -81,7 +78,7 @@ public class ControllerAdvice {
     public ErrorResponse handlerDuplicateFound(DuplicateFoundException e) {
         String localizedMessage = messageSource.getMessage(
                 e.getMessage(),
-                null,
+                new Object[]{e.getMessageKey()},
                 LocaleContextHolder.getLocale());
 
         return ErrorResponse.builder()

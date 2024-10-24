@@ -135,7 +135,7 @@ public class RideServiceImpl implements RideService {
         String departure = createRideRequest.addressDeparture();
 
         if (destination.equals(departure)) {
-            throw new DuplicateFoundException(ERROR_NO_WAY);
+            throw new DuplicateFoundException(ERROR_NO_WAY, destination);
         }
     }
 
@@ -145,7 +145,7 @@ public class RideServiceImpl implements RideService {
         String departure = updateRideRequest.addressDeparture();
 
         if (destination.equals(departure)) {
-            throw new DuplicateFoundException(ERROR_NO_WAY);
+            throw new DuplicateFoundException(ERROR_NO_WAY, destination);
         }
     }
 
