@@ -1,19 +1,14 @@
 package com.kpavlov.ratingservice.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
 import java.util.List;
 
-@Getter
-@AllArgsConstructor
-public class RatingResponsePage {
+public record RatingResponsePage (
 
-    private List<RatingResponse> rates;
+        List<RatingResponse> ratingResponses,
 
-    private int currentPage;
+        int currentPage,
 
-    private int totalPages;
+        int totalPages,
 
-    private long totalElements;
-}
+        long totalElements
+) {}

@@ -21,6 +21,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.kpavlov.ratingservice.util.PaginationDefaultValues.DEFAULT_LIMIT;
+import static com.kpavlov.ratingservice.util.PaginationDefaultValues.DEFAULT_OFFSET;
+import static com.kpavlov.ratingservice.util.PaginationDefaultValues.MAX_LIMIT;
+import static com.kpavlov.ratingservice.util.PaginationDefaultValues.MIN_LIMIT;
+import static com.kpavlov.ratingservice.util.PaginationDefaultValues.MIN_OFFSET;
+
 
 @RequiredArgsConstructor
 @RestController
@@ -42,11 +48,18 @@ public class RatingController {
         return ratingService.updateRating(id, updateRatingRequest);
     }
 
-    @PutMapping("/{id}/rate")
-    public RatingResponse updateRate(
+    @PutMapping("/{id}/driverRate")
+    public void updateDriverRate(
             @PathVariable long id,
-            @RequestParam @Valid Integer rate) {
-        return ratingService.updateRate(id, rate);
+            @RequestParam @Valid int rate) {
+        ratingService.updateDriverRate(id, rate);
+    }
+
+    @PutMapping("/{id}/passengerRate")
+    public void updatePassengerRate(
+            @PathVariable long id,
+            @RequestParam @Valid int rate) {
+        ratingService.updatePassengerRate(id, rate);
     }
 
     @GetMapping("/{id}")
@@ -60,8 +73,28 @@ public class RatingController {
     }
 
     @GetMapping
-    public RatingResponsePage getAllRatings(@RequestParam(value = "offset", defaultValue = "0") @Min(0) Integer offset,
-                                                  @RequestParam(value = "limit", defaultValue = "20") @Min(1) @Max(100) Integer limit) {
+    public RatingResponsePage getAllRatings(@RequestParam(value = "offset", defaultValue = DEFAULT_OFFSET)
+                                                @Min(MIN_OFFSET) Integer offset,
+                                            @RequestParam(value = "limit", defaultValue = DEFAULT_LIMIT)
+                                                @Min(MIN_LIMIT) @Max(MAX_LIMIT) Integer limit) {
         return ratingService.getAllRatings(offset, limit);
+    }
+
+    @GetMapping("/{id}/driver")
+    public RatingResponsePage getRatingsByDriverId(@PathVariable long id,
+                                            @RequestParam(value = "offset", defaultValue = DEFAULT_OFFSET)
+                                            @Min(MIN_OFFSET) Integer offset,
+                                            @RequestParam(value = "limit", defaultValue = DEFAULT_LIMIT)
+                                            @Min(MIN_LIMIT) @Max(MAX_LIMIT) Integer limit) {
+        return ratingService.findRatingsByDriverId(id, offset, limit);
+    }
+
+    @GetMapping("/{id}/passenger")
+    public RatingResponsePage getRatingsByPassengerId(@PathVariable long id,
+                                            @RequestParam(value = "offset", defaultValue = DEFAULT_OFFSET)
+                                            @Min(MIN_OFFSET) Integer offset,
+                                            @RequestParam(value = "limit", defaultValue = DEFAULT_LIMIT)
+                                            @Min(MIN_LIMIT) @Max(MAX_LIMIT) Integer limit) {
+        return ratingService.findRatingsByPassengerId(id, offset, limit);
     }
 }

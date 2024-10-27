@@ -11,9 +11,7 @@ import java.util.Optional;
 @Repository
 public interface RatingRepository extends JpaRepository<Rating, Long> {
 
-    Optional<Rating> findById(Long id);
-
-    Page findAllByRideId(long status, Pageable pageable);
+    Optional<Rating> findById(long id);
 
     Page findAllByPassengerId(long passengerId, Pageable pageable);
 

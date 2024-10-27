@@ -1,0 +1,45 @@
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="v1-1" author="strangerforfallen@gmail.com">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="rating"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="rating">
+            <column name="id" type="serial" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="driver_id" type="serial">
+                <constraints nullable="false"/>
+            </column>
+            <column name="passenger_id" type="serial">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ride_id" type="serial">
+                <constraints nullable="false"/>
+            </column>
+            <column name="driver_rate" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="passenger_rate" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="driver_comment" type="varchar(40)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="passenger_comment" type="varchar(40)">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+        <rollback>
+            <dropTable tableName="rating"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

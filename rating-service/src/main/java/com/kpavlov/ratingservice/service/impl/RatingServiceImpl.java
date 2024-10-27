@@ -11,14 +11,12 @@ import com.kpavlov.ratingservice.model.Rating;
 import com.kpavlov.ratingservice.repository.RatingRepository;
 import com.kpavlov.ratingservice.service.RatingService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.kpavlov.ratingservice.util.ErrorMessages.ERROR_NOT_FOUND;
 
@@ -28,10 +26,7 @@ public class RatingServiceImpl implements RatingService {
 
     private final RatingRepository ratingRepository;
     private final RatingMapper ratingMapper;
-
     private final RatingPageMapper ratingPageMapper;
-
-    private final MessageSource messageSource;
 
     @Override
     @Transactional
@@ -40,71 +35,93 @@ public class RatingServiceImpl implements RatingService {
 
         Rating rating = ratingMapper.createRequestToEntity(createRatingRequest);
 
-        return ratingMapper.toResponse(ratingRepository.save(rating));
+        ratingRepository.save(rating);
+        return ratingMapper.toResponse(rating);
     }
 
     @Override
     @Transactional
-    public RatingResponse updateRating(Long id, RatingUpdateRequest updateRatingRequest) {
+    public RatingResponse updateRating(long id, RatingUpdateRequest updateRatingRequest) {
         Rating rating = findRatingByIdOrThrow(id);
 
         checkUpdateRatingData(updateRatingRequest, rating);
 
         ratingMapper.updateRatingFromUpdateRequest(updateRatingRequest, rating);
-        return ratingMapper.toResponse(ratingRepository.save(rating));
+        ratingRepository.save(rating);
+        return ratingMapper.toResponse(rating);
     }
 
     @Override
     @Transactional
-    public void updateDriverRate(Long id, int rate) {
-        Rating rating = ratingRepository.findAllByDriverId(id);
+    public void updateDriverRate(long id, int rate) {
+        Rating rating = findRatingByIdOrThrow(id);
 
-        rating.setPassengerRate(rate);
-
-        ratingMapper.toResponse(ratingRepository.save(rating));
+        rating.setDriverRate(rate);
+        ratingRepository.save(rating);
     }
 
     @Override
     @Transactional
-    public void updatePassengerRate(Long id, int rate) {
+    public void updatePassengerRate(long id, int rate) {
         Rating rating = findRatingByIdOrThrow(id);
 
         rating.setPassengerRate(rate);
-
-        ratingMapper.toResponse(ratingRepository.save(rating));
+        ratingRepository.save(rating);
     }
 
     @Override
     @Transactional
-    public void deleteRating(Long id) {
+    public void deleteRating(long id) {
         ratingRepository.deleteById(id);
     }
 
     @Override
-    public RatingResponse getRatingById(Long id) {
+    public RatingResponse getRatingById(long id) {
         Rating rating = findRatingByIdOrThrow(id);
         return ratingMapper.toResponse(rating);
     }
 
     @Override
-    public RatingResponsePage getRatingByDriverId(Long id) {
-        return null;
+    public RatingResponsePage findRatingsByDriverId(long id, int offset, int limit) {
+        Page<Rating> ratingPage = ratingRepository.findAllByDriverId(id, PageRequest.of(offset, limit));
+
+        List<RatingResponse> ratingResponses = ratingPage.getContent().stream()
+                .map(ratingMapper::toResponse)
+                .toList();
+
+        return ratingPageMapper.toRatingResponsePage(ratingResponses, ratingPage, limit);
     }
 
     @Override
-    public RatingResponsePage getRatingByPassengerId(Long id) {
-        return null;
+    public RatingResponsePage findRatingsByPassengerId(long id, int offset, int limit) {
+        Page<Rating> ratingPage = ratingRepository.findAllByPassengerId(id, PageRequest.of(offset, limit));
+
+        List<RatingResponse> ratingResponses = ratingPage.getContent().stream()
+                .map(ratingMapper::toResponse)
+                .toList();
+
+        return ratingPageMapper.toRatingResponsePage(ratingResponses, ratingPage, limit);
     }
 
     @Override
     public RatingResponsePage getAllRatings(int offset, int limit) {
         Page<Rating> ratingPage = ratingRepository.findAll(PageRequest.of(offset, limit));
 
-        List<RatingResponse> ratingResponse = ratingPage.getContent().stream()
-                .map(rating -> new RatingResponse(rating.getId(), rating.getDriverId(), rating.getPassengerId(), rating.getRate(), rating.getComment()))
-                .collect(Collectors.toList());
+        List<RatingResponse> ratingResponses = ratingPage.getContent().stream()
+                .map(ratingMapper::toResponse)
+                .toList();
 
-        return new RatingResponsePage(ratingResponse, ratingPage.getNumber(), ratingPage.getTotalPages(), ratingPage.getTotalElements());
+        return ratingPageMapper.toRatingResponsePage(ratingResponses, ratingPage, limit);
+    }
+
+    @Override
+    public Float getDriverRating(long id) {
+        return null;
+    }
+
+    @Override
+    public Float getPassengerRating(long id) {
+        return null;
     }
 
     private void checkCreateRatingData(RatingCreateRequest createRatingRequest){}
@@ -112,12 +129,9 @@ public class RatingServiceImpl implements RatingService {
     private void checkUpdateRatingData(RatingUpdateRequest updateRatingRequest,
                                        Rating existingRating) {}
 
-    private Rating findRatingByIdOrThrow(Long id) {
+    private Rating findRatingByIdOrThrow(long id) {
         return ratingRepository.findById(id)
                 .orElseThrow(
-                        () -> new RatingNotFoundException(messageSource.getMessage(
-                ERROR_NOT_FOUND,
-                new Object[]{id},
-                null)));
+                        () -> new RatingNotFoundException(ERROR_NOT_FOUND, Long.toString(id)));
     }
 }

@@ -9,19 +9,23 @@ public interface RatingService {
 
     RatingResponse createRating(RatingCreateRequest createRatingRequest);
 
-    RatingResponse updateRating(Long id, RatingUpdateRequest updateRatingRequest);
+    RatingResponse updateRating(long id, RatingUpdateRequest updateRatingRequest);
 
-    void updateDriverRate(Long id, int rate);
+    void updateDriverRate(long id, int rate);
 
-    void updatePassengerRate(Long id, int rate);
+    void updatePassengerRate(long id, int rate);
 
-    void deleteRating(Long id);
+    void deleteRating(long id);
 
-    RatingResponse getRatingById(Long id);
+    RatingResponse getRatingById(long id);
 
-    RatingResponsePage getRatingByDriverId(Long id);
+    RatingResponsePage findRatingsByDriverId(long id, int offset, int limit);
 
-    RatingResponsePage getRatingByPassengerId(Long id);
+    RatingResponsePage findRatingsByPassengerId(long id, int offset, int limit);
 
     RatingResponsePage getAllRatings(int offset, int limit);
+
+    Float getDriverRating(long id);
+
+    Float getPassengerRating(long id);
 }

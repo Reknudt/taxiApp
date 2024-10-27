@@ -5,6 +5,9 @@ import com.kpavlov.ratingservice.dto.response.error.MultiErrorResponse;
 import com.kpavlov.ratingservice.exception.DuplicateFoundException;
 import com.kpavlov.ratingservice.exception.RatingNotFoundException;
 import com.kpavlov.ratingservice.util.ErrorMessages;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -16,14 +19,22 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class ControllerAdvice {
+
+    private final MessageSource messageSource;
 
     @ExceptionHandler(RatingNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handlerResourceNotFound(RatingNotFoundException e) {
+        String localizedMessage = messageSource.getMessage(
+                e.getMessage(),
+                new Object[]{e.getMessageKey()},
+                LocaleContextHolder.getLocale());
+
         return ErrorResponse.builder()
                 .status(HttpStatus.NOT_FOUND.value())
-                .message(e.getMessage())
+                .message(localizedMessage)
                 .build();
     }
 
@@ -65,9 +76,14 @@ public class ControllerAdvice {
     @ExceptionHandler(DuplicateFoundException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handlerDuplicateFound(DuplicateFoundException e) {
+        String localizedMessage = messageSource.getMessage(
+                e.getMessage(),
+                new Object[]{e.getMessageKey()},
+                LocaleContextHolder.getLocale());
+
         return ErrorResponse.builder()
                 .status(HttpStatus.CONFLICT.value())
-                .message(e.getMessage())
+                .message(localizedMessage)
                 .build();
     }
 }
