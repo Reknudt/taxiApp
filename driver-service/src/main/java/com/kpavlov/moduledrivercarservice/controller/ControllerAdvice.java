@@ -6,6 +6,9 @@ import com.kpavlov.moduledrivercarservice.exception.DriverNotFoundException;
 import com.kpavlov.moduledrivercarservice.util.ErrorMessages;
 import com.kpavlov.moduledrivercarservice.dto.response.error.ErrorResponse;
 import com.kpavlov.moduledrivercarservice.dto.response.error.MultiErrorResponse;
+import lombok.AllArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -16,14 +19,22 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 
 @RestControllerAdvice
+@AllArgsConstructor
 public class ControllerAdvice {
+
+    private final MessageSource messageSource;
 
     @ExceptionHandler(DriverNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handlerDriverResourceNotFound(DriverNotFoundException e) {
+        String localizedMessage = messageSource.getMessage(
+                e.getMessage(),
+                new Object[]{e.getMessageKey()},
+                LocaleContextHolder.getLocale());
+
         return ErrorResponse.builder()
                 .status(HttpStatus.NOT_FOUND.value())
-                .message(e.getMessage())
+                .message(localizedMessage)
                 .build();
     }
 

@@ -15,4 +15,8 @@ public final class HttpErrorMessages {
     public static final String  ERROR_NOT_FOUND = "error.not.found";
 
     public static final String  ERROR_NO_WAY = "error.no.way";
+
+    public static final String DRIVER_NOT_FOUND = "error.driver.not.found";
+
+    public static final String PASSENGER_NOT_FOUND = "error.passenger.not.found";
 }

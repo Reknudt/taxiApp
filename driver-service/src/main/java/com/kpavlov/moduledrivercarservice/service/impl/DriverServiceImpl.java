@@ -127,9 +127,6 @@ public class DriverServiceImpl implements DriverService {
     private Driver findDriverByIdOrThrow(Long id) {
         return driverRepository.findById(id)
                 .orElseThrow(
-                        () -> new DriverNotFoundException(messageSource.getMessage(
-                                ERROR_NOT_FOUND,
-                                new Object[]{id},
-                                LocaleContextHolder.getLocale())));
+                        () -> new DriverNotFoundException(ERROR_NOT_FOUND, Long.toString(id)));
     }
 }

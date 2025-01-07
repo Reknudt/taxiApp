@@ -6,6 +6,7 @@ import com.kpavlov.rideservice.dto.request.update.RideUpdateRequest;
 import com.kpavlov.rideservice.dto.response.RideResponse;
 import com.kpavlov.rideservice.dto.response.RideResponsePage;
 import com.kpavlov.rideservice.exception.DuplicateFoundException;
+import com.kpavlov.rideservice.exception.ResourceNotFoundException;
 import com.kpavlov.rideservice.exception.RideNotFoundException;
 import com.kpavlov.rideservice.mapper.RideMapper;
 import com.kpavlov.rideservice.mapper.RidePageMapper;
@@ -21,8 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.kpavlov.rideservice.util.HttpErrorMessages.DRIVER_NOT_FOUND;
 import static com.kpavlov.rideservice.util.HttpErrorMessages.ERROR_NOT_FOUND;
 import static com.kpavlov.rideservice.util.HttpErrorMessages.ERROR_NO_WAY;
+import static com.kpavlov.rideservice.util.HttpErrorMessages.PASSENGER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +34,8 @@ public class RideServiceImpl implements RideService {
     private final RideRepository rideRepository;
     private final RideMapper rideMapper;
     private final RidePageMapper ridePageMapper;
-    private final ControllerAdvice controllerAdvice;
+    private final KafkaProducer kafkaProducer;
+    private final KafkaConsumer kafkaConsumer;
 
     @Override
     @Transactional
@@ -137,6 +141,23 @@ public class RideServiceImpl implements RideService {
         if (destination.equals(departure)) {
             throw new DuplicateFoundException(ERROR_NO_WAY, destination);
         }
+
+        try {
+            String existingDriver = String.valueOf(createRideRequest.driverId());
+            String existingPassenger = String.valueOf(createRideRequest.passengerId());
+
+            kafkaProducer.sendMessage("driverFromRide", existingDriver);
+            kafkaProducer.sendMessage("passengerFromRide", existingPassenger);
+
+            Thread.sleep(100);
+
+            if (!kafkaConsumer.driverExist) {
+                throw new ResourceNotFoundException(DRIVER_NOT_FOUND, existingDriver);
+            }
+            if (!kafkaConsumer.passengerExist) {
+                throw new ResourceNotFoundException(PASSENGER_NOT_FOUND, existingPassenger);
+            }
+        } catch (InterruptedException e) {}
     }
 
     private void checkUpdateRideData(RideUpdateRequest updateRideRequest, Ride existingRide) {
@@ -147,6 +168,23 @@ public class RideServiceImpl implements RideService {
         if (destination.equals(departure)) {
             throw new DuplicateFoundException(ERROR_NO_WAY, destination);
         }
+
+        try {
+            String existingDriver = String.valueOf(updateRideRequest.driverId());
+            String existingPassenger = String.valueOf(updateRideRequest.passengerId());
+
+            kafkaProducer.sendMessage("driverFromRide", existingDriver);
+            kafkaProducer.sendMessage("passengerFromRide", existingPassenger);
+
+            Thread.sleep(100);
+
+            if (!kafkaConsumer.driverExist) {
+                throw new ResourceNotFoundException(DRIVER_NOT_FOUND, existingDriver);
+            }
+            if (!kafkaConsumer.passengerExist) {
+                throw new ResourceNotFoundException(PASSENGER_NOT_FOUND, existingPassenger);
+            }
+        } catch (InterruptedException e) {}
     }
 
     private Ride findRideById(long id) {

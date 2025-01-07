@@ -97,4 +97,14 @@ public class RatingController {
                                             @Min(MIN_LIMIT) @Max(MAX_LIMIT) Integer limit) {
         return ratingService.findRatingsByPassengerId(id, offset, limit);
     }
+
+    @GetMapping("/{driverId}/driverRate")
+    public float getDriverRatingByDriverId(@PathVariable long driverId) {
+        return ratingService.getDriverRating(driverId);
+    }
+
+    @GetMapping("/{passengerId}/passengerRate")
+    public float getPassengerRatingByPassengerId(@PathVariable long passengerId) {
+        return ratingService.getPassengerRating(passengerId);
+    }
 }

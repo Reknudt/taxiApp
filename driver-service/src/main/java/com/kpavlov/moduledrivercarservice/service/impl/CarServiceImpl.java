@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.kpavlov.moduledrivercarservice.util.ErrorMessages.ERROR_DUPLICATE_REG_CODE;
-import static com.kpavlov.moduledrivercarservice.util.ErrorMessages.ERROR_NOT_FOUND;
+import static com.kpavlov.moduledrivercarservice.util.ErrorMessages. ERROR_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor

@@ -1,6 +1,14 @@
 package com.kpavlov.moduledrivercarservice.exception;
 
+import lombok.Getter;
+
 public class DriverNotFoundException extends RuntimeException {
 
-    public DriverNotFoundException(String message) { super(message); }
+    @Getter
+    private final String messageKey;
+
+    public DriverNotFoundException(String message, String messageKey) {
+        super(message);
+        this.messageKey = messageKey;
+    }
 }

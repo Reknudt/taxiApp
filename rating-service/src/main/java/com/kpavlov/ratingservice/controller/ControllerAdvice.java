@@ -4,6 +4,7 @@ import com.kpavlov.ratingservice.dto.response.error.ErrorResponse;
 import com.kpavlov.ratingservice.dto.response.error.MultiErrorResponse;
 import com.kpavlov.ratingservice.exception.DuplicateFoundException;
 import com.kpavlov.ratingservice.exception.RatingNotFoundException;
+import com.kpavlov.ratingservice.exception.ResourceNotFoundException;
 import com.kpavlov.ratingservice.util.ErrorMessages;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -83,6 +84,20 @@ public class ControllerAdvice {
 
         return ErrorResponse.builder()
                 .status(HttpStatus.CONFLICT.value())
+                .message(localizedMessage)
+                .build();
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handlerResourceNotFound(ResourceNotFoundException e) {
+        String localizedMessage = messageSource.getMessage(
+                e.getMessage(),
+                new Object[]{e.getMessageKey()},
+                LocaleContextHolder.getLocale());
+
+        return ErrorResponse.builder()
+                .status(HttpStatus.NOT_FOUND.value())
                 .message(localizedMessage)
                 .build();
     }

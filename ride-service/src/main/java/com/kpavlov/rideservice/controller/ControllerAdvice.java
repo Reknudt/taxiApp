@@ -4,6 +4,7 @@ import com.kpavlov.rideservice.dto.response.error.ErrorResponse;
 import com.kpavlov.rideservice.dto.response.error.MultiErrorResponse;
 import com.kpavlov.rideservice.exception.DuplicateFoundException;
 import com.kpavlov.rideservice.exception.RideNotFoundException;
+import com.kpavlov.rideservice.exception.ResourceNotFoundException;
 import com.kpavlov.rideservice.util.HttpErrorMessages;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -83,6 +84,20 @@ public class ControllerAdvice {
 
         return ErrorResponse.builder()
                 .status(HttpStatus.CONFLICT.value())
+                .message(localizedMessage)
+                .build();
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handlerResourceNotFound(ResourceNotFoundException e) {
+        String localizedMessage = messageSource.getMessage(
+                e.getMessage(),
+                new Object[]{e.getMessageKey()},
+                LocaleContextHolder.getLocale());
+
+        return ErrorResponse.builder()
+                .status(HttpStatus.NOT_FOUND.value())
                 .message(localizedMessage)
                 .build();
     }

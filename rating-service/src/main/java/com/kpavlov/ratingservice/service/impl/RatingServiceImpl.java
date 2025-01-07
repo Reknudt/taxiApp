@@ -1,10 +1,13 @@
 package com.kpavlov.ratingservice.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kpavlov.ratingservice.dto.request.create.RatingCreateRequest;
 import com.kpavlov.ratingservice.dto.request.update.RatingUpdateRequest;
 import com.kpavlov.ratingservice.dto.response.RatingResponse;
 import com.kpavlov.ratingservice.dto.response.RatingResponsePage;
 import com.kpavlov.ratingservice.exception.RatingNotFoundException;
+import com.kpavlov.ratingservice.exception.ResourceNotFoundException;
+import com.kpavlov.ratingservice.mapper.RatingKafkaMapper;
 import com.kpavlov.ratingservice.mapper.RatingMapper;
 import com.kpavlov.ratingservice.mapper.RatingPageMapper;
 import com.kpavlov.ratingservice.model.Rating;
@@ -18,7 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.kpavlov.ratingservice.util.ErrorMessages.DRIVER_NOT_FOUND;
 import static com.kpavlov.ratingservice.util.ErrorMessages.ERROR_NOT_FOUND;
+import static com.kpavlov.ratingservice.util.ErrorMessages.PASSENGER_NOT_FOUND;
+import static com.kpavlov.ratingservice.util.ErrorMessages.RIDE_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +33,8 @@ public class RatingServiceImpl implements RatingService {
     private final RatingRepository ratingRepository;
     private final RatingMapper ratingMapper;
     private final RatingPageMapper ratingPageMapper;
+    private final KafkaProducer kafkaProducer;
+    private final KafkaConsumer kafkaConsumer;
 
     @Override
     @Transactional
@@ -115,19 +123,76 @@ public class RatingServiceImpl implements RatingService {
     }
 
     @Override
-    public Float getDriverRating(long id) {
-        return null;
+    public Float getDriverRating(long driverId) {
+        List<Rating> ratings = ratingRepository.findAllByDriverId(driverId);
+
+        double avg = 0;
+
+        for(Rating rating : ratings) {
+            avg += rating.getDriverRate();
+        }
+        return (float) avg/ratings.size();
     }
 
     @Override
-    public Float getPassengerRating(long id) {
-        return null;
+    public Float getPassengerRating(long passengerId) {
+        List<Rating> ratings = ratingRepository.findAllByDriverId(passengerId);
+
+        double avg = 0;
+
+        for(Rating rating : ratings) {
+            avg += rating.getPassengerRate();
+        }
+        return (float) avg/ratings.size();
     }
 
-    private void checkCreateRatingData(RatingCreateRequest createRatingRequest){}
+    private void checkCreateRatingData(RatingCreateRequest createRatingRequest) {
+        try {
+            String existingDriver = String.valueOf(createRatingRequest.driverId());
+            String existingRide = String.valueOf(createRatingRequest.rideId());
+            String existingPassenger = String.valueOf(createRatingRequest.passengerId());
 
-    private void checkUpdateRatingData(RatingUpdateRequest updateRatingRequest,
-                                       Rating existingRating) {}
+            kafkaProducer.sendMessage("driver", existingDriver);
+            kafkaProducer.sendMessage("ride", existingRide);
+            kafkaProducer.sendMessage("passenger", existingPassenger);
+
+            Thread.sleep(200);
+
+            if (!kafkaConsumer.driverExist) {
+                throw new ResourceNotFoundException(DRIVER_NOT_FOUND, existingDriver);
+            }
+            if (!kafkaConsumer.rideExist) {
+                throw new ResourceNotFoundException(RIDE_NOT_FOUND, existingRide);
+            }
+            if (!kafkaConsumer.passengerExist) {
+                throw new ResourceNotFoundException(PASSENGER_NOT_FOUND, existingPassenger);
+            }
+        } catch (InterruptedException e) {}
+    }
+
+    private void checkUpdateRatingData(RatingUpdateRequest updateRatingRequest, Rating existingRating) {
+        try {
+            String existingDriver = String.valueOf(updateRatingRequest.driverId());
+            String existingRide = String.valueOf(updateRatingRequest.rideId());
+            String existingPassenger = String.valueOf(updateRatingRequest.passengerId());
+
+            kafkaProducer.sendMessage("driver", existingDriver);
+            kafkaProducer.sendMessage("ride", existingRide);
+            kafkaProducer.sendMessage("passenger", existingPassenger);
+
+            Thread.sleep(200);
+
+            if (!kafkaConsumer.driverExist) {
+                throw new ResourceNotFoundException(DRIVER_NOT_FOUND, existingDriver);
+            }
+            if (!kafkaConsumer.rideExist) {
+                throw new ResourceNotFoundException(RIDE_NOT_FOUND, existingRide);
+            }
+            if (!kafkaConsumer.passengerExist) {
+                throw new ResourceNotFoundException(PASSENGER_NOT_FOUND, existingPassenger);
+            }
+        } catch (InterruptedException e) {}
+    }
 
     private Rating findRatingByIdOrThrow(long id) {
         return ratingRepository.findById(id)

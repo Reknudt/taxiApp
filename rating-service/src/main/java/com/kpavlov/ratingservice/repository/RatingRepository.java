@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -15,5 +16,9 @@ public interface RatingRepository extends JpaRepository<Rating, Long> {
 
     Page findAllByPassengerId(long passengerId, Pageable pageable);
 
+    List<Rating> findAllByPassengerId(long passengerId);
+
     Page findAllByDriverId(long driverId, Pageable pageable);
+
+    List<Rating> findAllByDriverId(long driverId);
 }
